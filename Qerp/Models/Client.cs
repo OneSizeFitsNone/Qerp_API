@@ -21,6 +21,7 @@ namespace Qerp.Models
         public long? CityId { get; set; }
         public string Description { get; set; }
         public string Email { get; set; }
+        public ulong? InvoiceSameAddress { get; set; }
         public string InvoiceAddress { get; set; }
         public long? InvoiceCityId { get; set; }
         public string InvoiceEmail { get; set; }

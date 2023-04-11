@@ -13,7 +13,17 @@ namespace Qerp.ModelViews
             try
             {
                 using QerpContext db = new QerpContext();
-                ClientMV oClientMV = ObjectManipulation.CastObject<ClientMV>(await db.Clients.FirstAsync(c => c.Id == id && c.CompanyId == companyId));
+                ClientMV oClientMV = ObjectManipulation.CastObject<ClientMV>(
+                    await db.Clients
+                        .Include (c => c.City)
+                        .ThenInclude(cc => cc.Province)
+                        .ThenInclude(p => p.Country)
+                        .Include(c => c.InvoiceCity)
+                        .ThenInclude(ic => ic.Province)
+                        .ThenInclude(p => p.Country)
+                        .Include(c => c.Images)
+                        .FirstAsync(c => c.Id == id && c.CompanyId == companyId)
+                );
                 return new ReturnResult(true, "", oClientMV);
             }
             catch (Exception ex)
@@ -27,7 +37,12 @@ namespace Qerp.ModelViews
             try
             {
                 using QerpContext db = new QerpContext();
-                List<ClientMV> lstClientMV = ObjectManipulation.CastObject<List<ClientMV>>(await db.Clients.Where(x => x.CompanyId == companyId).ToListAsync());
+                List<ClientMV> lstClientMV = ObjectManipulation.CastObject<List<ClientMV>>(
+                    await db.Clients
+                    .Include(c => c.City).ThenInclude(cc => cc.Province).ThenInclude(p => p.Country)
+                    .Include (c => c.InvoiceCity).ThenInclude (ic => ic.Province).ThenInclude (p => p.Country)
+                    .Where(x => x.CompanyId == companyId).ToListAsync()
+                );
                 return new ReturnResult(true, "", lstClientMV);
             }
             catch (Exception ex)
@@ -40,10 +55,14 @@ namespace Qerp.ModelViews
         {
             try
             {
+                this.City = null;
+                this.InvoiceCity = null;
+                if(this.InvoiceSameAddress == 1) { this.InvoiceCityId = null; this.InvoiceAddress = null; }
                 using QerpContext db = new QerpContext();
                 db.Add(this);
                 await db.SaveChangesAsync();
-                return new ReturnResult(true, "", this);
+                ReturnResult result = await ClientMV.SelectById(this.Id, this.CompanyId);
+                return new ReturnResult(true, "", result.Object);
             }
             catch (Exception ex)
             {
@@ -56,10 +75,14 @@ namespace Qerp.ModelViews
         {
             try
             {
+                this.City = null;
+                this.InvoiceCity = null;
+                if (this.InvoiceSameAddress == 1) { this.InvoiceCityId = null; this.InvoiceAddress = null; }
                 using QerpContext db = new QerpContext();
                 db.Entry(this).State = EntityState.Modified;
                 await db.SaveChangesAsync();
-                return new ReturnResult(true, "", this);
+                ReturnResult result = await ClientMV.SelectById(this.Id, this.CompanyId);
+                return new ReturnResult(true, "", result.Object);
             }
             catch (Exception ex)
             {
@@ -89,16 +112,34 @@ namespace Qerp.ModelViews
             try
             {
                 using QerpContext db = new QerpContext();
-                List<ClientMV> clients = ObjectManipulation.CastObject<List<ClientMV>>(
-                    await db.Clients.Where(c =>
+                List<Client> clients = await db.Clients
+                    .Include(c => c.City)
+                    .ThenInclude(cc => cc.Province)
+                    .Include(c => c.City)
+                    .ThenInclude(cc => cc.Country)
+                    .Include(c => c.InvoiceCity)
+                    .ThenInclude(cc => cc.Province)
+                    .Include(c => c.InvoiceCity)
+                    .ThenInclude(cc => cc.Country)
+                    .Include(c => c.Images.OrderBy(i => i.Sort).Take(1))
+                    .Where(c =>
                         c.CompanyId == companyId &&
                         (this.Name == null || c.Name.Contains(this.Name)) &&
-                        (this.Address == null || c.Address.Contains(this.Address)) &&
                         (this.Email == null || c.Email == this.Email) &&
                         (this.Vat == null || c.Vat == this.Vat) &&
-                        (this.Iban == null || c.Iban == this.Iban)
-                    ).ToListAsync()
-                );
+                        (this.Iban == null || c.Iban == this.Iban) &&
+                        (this.Description == null || c.Description.Contains(this.Description)) &&
+                        (this.Address == null || c.Address.Contains(this.Address)) &&
+                        (this.CityId == null || c.CityId == this.CityId) &&
+                        (this.City.ProvinceId == null || c.City.ProvinceId == this.City.ProvinceId) &&
+                        (this.City.CountryId == null || c.City.CountryId == this.City.CountryId) &&
+                        (this.InvoiceAddress == null || c.InvoiceAddress.Contains(this.InvoiceAddress)) &&
+                        (this.InvoiceCityId == null || c.InvoiceCityId == this.InvoiceCityId) &&
+                        (this.InvoiceCity.ProvinceId == null || c.InvoiceCity.ProvinceId == this.InvoiceCity.ProvinceId) &&
+                        (this.InvoiceCity.CountryId == null || c.InvoiceCity.CountryId == this.InvoiceCity.CountryId)
+                    )
+                    .ToListAsync();
+                
                 if(clients.Count > 0)
                 {
                     return new ReturnResult(true, "", clients);

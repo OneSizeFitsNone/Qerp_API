@@ -49,13 +49,6 @@ namespace Qerp.Controllers
             }
         }
 
-        [HttpPut]
-        public async Task<ReturnResult> Put(ContactMV contact)
-        {
-            if (_companyId != contact.CompanyId) { new ReturnResult(false, "Access Denied", null); }
-            return await contact.Update();
-        }
-
         [HttpDelete]
         public async Task<ReturnResult> Delete(ContactMV contact)
         {

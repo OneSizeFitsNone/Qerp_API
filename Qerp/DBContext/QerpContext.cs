@@ -207,6 +207,10 @@ namespace Qerp.DBContext
                     .HasMaxLength(150)
                     .HasColumnName("invoiceEmail");
 
+                entity.Property(e => e.InvoiceSameAddress)
+                    .HasColumnType("bit(1)")
+                    .HasColumnName("invoiceSameAddress");
+
                 entity.Property(e => e.Mobile)
                     .HasMaxLength(150)
                     .HasColumnName("mobile");

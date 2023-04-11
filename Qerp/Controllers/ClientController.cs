@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Net.Http.Headers;
 using Qerp.Interfaces;
+using Qerp.Models;
 using Qerp.ModelViews;
 using Qerp.Services;
 
@@ -38,16 +39,19 @@ namespace Qerp.Controllers
         [HttpPost]
         public async Task<ReturnResult> Post(ClientMV client)
         {
-            if (_companyId != client.CompanyId) { new ReturnResult(false, "Access Denied", null); }
-            return await client.Insert();
+            if (client.Id != 0)
+            {
+                if (_companyId != client.CompanyId) { return new ReturnResult(false, "Access Denied", null); }
+                return await client.Update();
+            }
+            else
+            {
+                client.CompanyId = _companyId;
+                return await client.Insert();
+            }
         }
 
-        [HttpPut]
-        public async Task<ReturnResult> Put(ClientMV client)
-        {
-            if (_companyId != client.CompanyId) { new ReturnResult(false, "Access Denied", null); }
-            return await client.Update();
-        }
+
 
         [HttpDelete]
         public async Task<ReturnResult> Delete(ClientMV client)

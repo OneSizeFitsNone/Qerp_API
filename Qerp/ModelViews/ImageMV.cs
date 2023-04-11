@@ -191,7 +191,7 @@ namespace Qerp.ModelViews
                 using QerpContext db = new QerpContext();
                 db.Entry(this).State = EntityState.Deleted;
                 await db.SaveChangesAsync();
-                return new ReturnResult(true, pathToDelete, this);
+                return new ReturnResult(true, "", this);
             }
             catch (Exception ex)
             {
