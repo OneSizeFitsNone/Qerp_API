@@ -27,8 +27,11 @@ namespace Qerp.ModelViews
             try
             {
                 using QerpContext db = new QerpContext();
-                List<ContactroleMV> lstContactroleMV = ObjectManipulation.CastObject<List<ContactroleMV>>(await db.Contactroles.Where(x => x.CompanyId == companyId).ToListAsync());
-                return new ReturnResult(true, "", lstContactroleMV);
+                List<Contactrole> lstContactrole = await db.Contactroles
+                    .Where(x => x.CompanyId == companyId)
+                    .OrderBy(cr => cr.Name)
+                    .ToListAsync();
+                return new ReturnResult(true, "", lstContactrole);
             }
             catch (Exception ex)
             {
