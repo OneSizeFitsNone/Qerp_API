@@ -7,6 +7,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using System.IO;
 using System.Dynamic;
+using System.Runtime.InteropServices;
 
 namespace Qerp.ModelViews
 {
@@ -158,12 +159,26 @@ namespace Qerp.ModelViews
         {
             try
             {
-                List<string> lstLink = this.Imagelink.Split(@"\").ToList();
+                List<string> lstLink;
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    lstLink = this.Imagelink.Split(@"/").ToList();
+                }
+                else
+                {
+                    lstLink = this.Imagelink.Split(@"\").ToList();
+                }
+
                 lstLink.RemoveAt(lstLink.Count - 1);
-                string subfolder = string.Join(@"\", lstLink);
 
                 var pathToDelete = Path.Combine(Directory.GetCurrentDirectory(), "Images");
-                pathToDelete = Path.Combine(pathToDelete, subfolder);
+                
+                foreach(string sLink in lstLink)
+                {
+                    pathToDelete = Path.Combine(pathToDelete, sLink);
+                }
+
                 if (Directory.Exists(pathToDelete))
                 {
                     Directory.Delete(pathToDelete, true);
@@ -176,7 +191,7 @@ namespace Qerp.ModelViews
                 using QerpContext db = new QerpContext();
                 db.Entry(this).State = EntityState.Deleted;
                 await db.SaveChangesAsync();
-                return new ReturnResult(true, "", this);
+                return new ReturnResult(true, pathToDelete, this);
             }
             catch (Exception ex)
             {
