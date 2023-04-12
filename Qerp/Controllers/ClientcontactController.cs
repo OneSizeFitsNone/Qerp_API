@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Qerp.Interfaces;
+using Qerp.Models;
 using Qerp.ModelViews;
 
 namespace Qerp.Controllers
@@ -29,17 +30,32 @@ namespace Qerp.Controllers
             return await ClientcontactMV.SelectById(id);
         }
 
+        [HttpGet("GetByContact/{id}")]
+        public async Task<ReturnResult> GetByContact(long id)
+        {
+            return await ClientcontactMV.SelectByContactId(id);
+        }
+
+        [HttpGet("GetByClient/{id}")]
+        public async Task<ReturnResult> GetByClient(long id)
+        {
+            return await ClientcontactMV.SelectByClientId(id);
+        }
+
+
         [HttpPost]
         public async Task<ReturnResult> Post(ClientcontactMV clientcontact)
         {
-            return await clientcontact.Insert();
+            if (clientcontact.Id != 0)
+            {
+                return await clientcontact.Update();
+            }
+            else
+            {
+                return await clientcontact.Insert();
+            }
         }
 
-        [HttpPut]
-        public async Task<ReturnResult> Put(ClientcontactMV clientcontact)
-        {
-            return await clientcontact.Update();
-        }
 
         [HttpDelete]
         public async Task<ReturnResult> Delete(ClientcontactMV clientcontact)

@@ -36,6 +36,51 @@ namespace Qerp.ModelViews
             }
         }
 
+
+        public static async Task<ReturnResult> SelectByContactId(long id)
+        {
+            try
+            {
+                using QerpContext db = new QerpContext();
+                List<Clientcontact> lstClientcontacts = await db.Clientcontacts
+                    .Include(c => c.Client)
+                    .ThenInclude(cc => cc.City)
+                    .ThenInclude(ccc => ccc.Province)
+                    .ThenInclude(cccp => cccp.Country)
+                    .Include(c => c.Contactrole)
+                    .Where(cc => cc.ContactId == id)
+                    .OrderBy(cc => cc.Client.Name)
+                    .ToListAsync();
+                return new ReturnResult(true, "", lstClientcontacts);
+            }
+            catch (Exception ex) 
+            {
+                return new ReturnResult(false, ex.Message, null);
+            }
+        }
+
+        public static async Task<ReturnResult> SelectByClientId(long id)
+        {
+            try
+            {
+                using QerpContext db = new QerpContext();
+                List<Clientcontact> lstClientcontacts = await db.Clientcontacts
+                    .Include(c => c.Contact)
+                    .ThenInclude(cc => cc.City)
+                    .ThenInclude(ccc => ccc.Province)
+                    .ThenInclude(cccp => cccp.Country)
+                    .Include(c => c.Contactrole)
+                    .Where(cc => cc.ContactId == id)
+                    .OrderBy(cc => cc.Contact.Fullname)
+                    .ToListAsync();
+                return new ReturnResult(true, "", lstClientcontacts);
+            }
+            catch (Exception ex)
+            {
+                return new ReturnResult(false, ex.Message, null);
+            }
+        }
+
         public async Task<ReturnResult> Insert()
         {
             try
