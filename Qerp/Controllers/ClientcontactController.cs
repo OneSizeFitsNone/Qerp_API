@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Qerp.Interfaces;
 using Qerp.Models;
 using Qerp.ModelViews;
+using Qerp.Services;
 
 namespace Qerp.Controllers
 {
@@ -13,9 +16,11 @@ namespace Qerp.Controllers
     {
         public long _companyId;
 
-        public ClientcontactController(IConfiguration config, IHttpContextAccessor httpContextAccessor)
+        public ClientcontactController(IMemoryCache memoryCache, IHttpContextAccessor httpContextAccessor)
         {
-            _companyId = Convert.ToInt64(httpContextAccessor.HttpContext?.Session.GetString("companyId") ?? "0");
+            var currentUser = new CurrentUserMM(memoryCache);
+            var token = httpContextAccessor.HttpContext.GetTokenAsync("access_token").GetAwaiter().GetResult();
+            _companyId = currentUser.GetCompanyByToken(token);
         }
 
         [HttpGet]

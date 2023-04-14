@@ -6,8 +6,12 @@ using Qerp.Services;
 
 namespace Qerp.ModelViews
 {
+
     public class ClientMV : Client
     {
+
+        public long? ForcedId;
+
         public static async Task<ReturnResult> SelectById(long id, long companyId)
         {
             try
@@ -124,28 +128,37 @@ namespace Qerp.ModelViews
                     .Include(c => c.Images.OrderBy(i => i.Sort).Take(1))
                     .Where(c =>
                         c.CompanyId == companyId &&
-                        (this.Name == null || c.Name.Contains(this.Name)) &&
-                        (this.Email == null || c.Email == this.Email) &&
-                        (this.Vat == null || c.Vat == this.Vat) &&
-                        (this.Iban == null || c.Iban == this.Iban) &&
-                        (this.Description == null || c.Description.Contains(this.Description)) &&
-                        (this.Address == null || c.Address.Contains(this.Address)) &&
-                        (this.CityId == null || c.CityId == this.CityId) &&
-                        (this.City.ProvinceId == null || c.City.ProvinceId == this.City.ProvinceId) &&
-                        (this.City.CountryId == null || c.City.CountryId == this.City.CountryId) &&
-                        (this.InvoiceAddress == null || c.InvoiceAddress.Contains(this.InvoiceAddress)) &&
-                        (this.InvoiceCityId == null || c.InvoiceCityId == this.InvoiceCityId) &&
-                        (this.InvoiceCity.ProvinceId == null || c.InvoiceCity.ProvinceId == this.InvoiceCity.ProvinceId) &&
-                        (this.InvoiceCity.CountryId == null || c.InvoiceCity.CountryId == this.InvoiceCity.CountryId)
+                        (
+                            (
+                                this.ForcedId != null && 
+                                (c.Id == this.ForcedId || (this.Name != null && (this.Name.Length > 2 && c.Name.StartsWith(this.Name))))
+                            ) ||
+                            (
+                                this.ForcedId == null && 
+                                (this.Name == null || c.Name.Contains(this.Name)) &&
+                                (this.Email == null || c.Email == this.Email) &&
+                                (this.Vat == null || c.Vat == this.Vat) &&
+                                (this.Iban == null || c.Iban == this.Iban) &&
+                                (this.Description == null || c.Description.Contains(this.Description)) &&
+                                (this.Address == null || c.Address.Contains(this.Address)) &&
+                                (this.CityId == null || c.CityId == this.CityId) &&
+                                (this.City.ProvinceId == null || c.City.ProvinceId == this.City.ProvinceId) &&
+                                (this.City.CountryId == null || c.City.CountryId == this.City.CountryId) &&
+                                (this.InvoiceAddress == null || c.InvoiceAddress.Contains(this.InvoiceAddress)) &&
+                                (this.InvoiceCityId == null || c.InvoiceCityId == this.InvoiceCityId) &&
+                                (this.InvoiceCity.ProvinceId == null || c.InvoiceCity.ProvinceId == this.InvoiceCity.ProvinceId) &&
+                                (this.InvoiceCity.CountryId == null || c.InvoiceCity.CountryId == this.InvoiceCity.CountryId)
+                            )
+                        )
                     )
                     .ToListAsync();
                 
-                if(clients.Count > 0)
+                if(clients.Count == 0 && this.ForcedId == null)
                 {
-                    return new ReturnResult(true, "", clients);
+                    return new ReturnResult(false, "warn.noresultsfound", null);
                 }
                 else {
-                    return new ReturnResult(false, "warn.noresultsfound", null);
+                    return new ReturnResult(true, "", clients);
                 }
                 
             }

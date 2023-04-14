@@ -13,7 +13,19 @@ namespace Qerp.ModelViews
             try
             {
                 using QerpContext db = new QerpContext();
-                ClientcontactMV oClientcontactMV = ObjectManipulation.CastObject<ClientcontactMV>(await db.Clientcontacts.FirstAsync(c => c.Id == id));
+                ClientcontactMV oClientcontactMV = ObjectManipulation.CastObject<ClientcontactMV>(
+                    await db.Clientcontacts
+                        .Include(c => c.Contact)
+                        .ThenInclude(cc => cc.City)
+                        .ThenInclude(ccc => ccc.Province)
+                        .ThenInclude(cccp => cccp.Country)
+                        .Include(c => c.Client)
+                        .ThenInclude(cc => cc.City)
+                        .ThenInclude(ccc => ccc.Province)
+                        .ThenInclude(cccp => cccp.Country)
+                        .Include(c => c.Contactrole)
+                        .FirstAsync(c => c.Id == id)
+                    );
                 return new ReturnResult(true, "", oClientcontactMV);
             }
             catch (Exception ex)
@@ -70,8 +82,8 @@ namespace Qerp.ModelViews
                     .ThenInclude(ccc => ccc.Province)
                     .ThenInclude(cccp => cccp.Country)
                     .Include(c => c.Contactrole)
-                    .Where(cc => cc.ContactId == id)
-                    .OrderBy(cc => cc.Contact.Fullname)
+                    .Where(cc => cc.ClientId == id)
+                    .OrderBy(cc => cc.Client.Name)
                     .ToListAsync();
                 return new ReturnResult(true, "", lstClientcontacts);
             }
@@ -88,7 +100,8 @@ namespace Qerp.ModelViews
                 using QerpContext db = new QerpContext();
                 db.Add(this);
                 await db.SaveChangesAsync();
-                return new ReturnResult(true, "", this);
+
+                return await ClientcontactMV.SelectById(this.Id);
             }
             catch (Exception ex)
             {
@@ -104,7 +117,7 @@ namespace Qerp.ModelViews
                 using QerpContext db = new QerpContext();
                 db.Entry(this).State = EntityState.Modified;
                 await db.SaveChangesAsync();
-                return new ReturnResult(true, "", this);
+                return await ClientcontactMV.SelectById(this.Id);
             }
             catch (Exception ex)
             {

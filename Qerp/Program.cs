@@ -27,6 +27,7 @@ var connectionString = builder.Configuration.GetConnectionString("QerpContext");
 builder.Services.AddDbContext<QerpContext>(options => {
 
     options.UseMySql(connectionString, ServerVersion.Parse("10.3.38"));
+    options.EnableSensitiveDataLogging(true);
 });
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -84,7 +85,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 builder.Services.AddMvc().AddNewtonsoftJson(options =>
 {
-    options.SerializerSettings.MaxDepth = 3;
+    options.SerializerSettings.MaxDepth = 5;
     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
     options.SerializerSettings.PreserveReferencesHandling = PreserveReferencesHandling.None;
 

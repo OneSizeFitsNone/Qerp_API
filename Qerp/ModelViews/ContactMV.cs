@@ -9,6 +9,9 @@ namespace Qerp.ModelViews
 {
     public class ContactMV : Contact
     {
+
+        public long? ForcedId;
+
         public static async Task<ReturnResult> SelectById(long id, long companyId)
         {
             try
@@ -115,28 +118,38 @@ namespace Qerp.ModelViews
                         .Include(c => c.Images.OrderBy(i => i.Sort).Take(1))
                         .Where(c =>
                             c.CompanyId == companyId &&
-                            (this.Fullname == null || c.Fullname.Contains(this.Fullname)) &&
-                            (this.Name == null || c.Name.Contains(this.Name)) &&
-                            (this.Surname == null || c.Surname.Contains(this.Surname)) &&
-                            (this.Description == null || c.Description.Contains(this.Description)) && 
-                            (this.Address == null || c.Address.Contains(this.Address)) &&
-                            (this.Email == null || c.Email == this.Email) &&
-                            (this.CityId == null || c.CityId == this.CityId) &&
-                            (this.City.ProvinceId == null || c.City.ProvinceId == this.City.ProvinceId) &&
-                            (this.City.CountryId == null || c.City.CountryId == this.City.CountryId)
+                            (
+                                (
+                                    this.ForcedId != null &&
+                                    (c.Id == this.ForcedId || (this.Fullname != null && (this.Fullname.Length > 2 && c.Fullname.StartsWith(this.Fullname))))
+                                ) ||
+                                (
+                                    this.ForcedId == null &&
+                                    (this.Fullname == null || c.Fullname.Contains(this.Fullname)) &&
+                                    (this.Name == null || c.Name.Contains(this.Name)) &&
+                                    (this.Surname == null || c.Surname.Contains(this.Surname)) &&
+                                    (this.Description == null || c.Description.Contains(this.Description)) &&
+                                    (this.Address == null || c.Address.Contains(this.Address)) &&
+                                    (this.Email == null || c.Email == this.Email) &&
+                                    (this.CityId == null || c.CityId == this.CityId) &&
+                                    (this.City.ProvinceId == null || c.City.ProvinceId == this.City.ProvinceId) &&
+                                    (this.City.CountryId == null || c.City.CountryId == this.City.CountryId)
+                                )
+                            )
+
                         )
                         .ToListAsync();
 
                 //List<ContactMV> contacts = ObjectManipulation.CastObject<List<ContactMV>>(
                 //    lstContacts
                 //);
-                if (lstContacts.Count > 0)
+                if (lstContacts.Count == 0 && this.ForcedId == null)
                 {
-                    return new ReturnResult(true, "", lstContacts);
+                    return new ReturnResult(false, "warn.noresultsfound", null);
                 }
                 else
                 {
-                    return new ReturnResult(false, "warn.noresultsfound", null);
+                    return new ReturnResult(true, "", lstContacts);
                 }
 
             }
