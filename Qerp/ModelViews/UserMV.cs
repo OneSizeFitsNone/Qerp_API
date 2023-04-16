@@ -101,6 +101,8 @@ namespace Qerp.ModelViews
                 UserMV oUserMV = ObjectManipulation.CastObject<UserMV>(
                     await db.Users
                         .Include(u => u.Contact)
+                        .ThenInclude(c => c.Images)
+                        .Include(u => u.Saveditems)
                         .FirstOrDefaultAsync(u => u.Username == username && u.Password == password)
                 );
                 if(oUserMV != null)
@@ -123,7 +125,6 @@ namespace Qerp.ModelViews
         public static long getCompanyByToken(string sToken)
         {
             using QerpContext db = new QerpContext();
-            //return db.Users.Where(c => c.LastToken == sToken).FirstOrDefault()?.CompanyId ?? 0;
             return 0;
         }
     }

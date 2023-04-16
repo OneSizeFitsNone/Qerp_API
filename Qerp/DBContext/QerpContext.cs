@@ -35,6 +35,7 @@ namespace Qerp.DBContext
         public virtual DbSet<Prospect> Prospects { get; set; }
         public virtual DbSet<Prospectgoal> Prospectgoals { get; set; }
         public virtual DbSet<Province> Provinces { get; set; }
+        public virtual DbSet<Saveditem> Saveditems { get; set; }
         public virtual DbSet<Models.Task> Tasks { get; set; }
         public virtual DbSet<Tasknote> Tasknotes { get; set; }
         public virtual DbSet<User> Users { get; set; }
@@ -233,6 +234,10 @@ namespace Qerp.DBContext
                 entity.Property(e => e.Vat)
                     .HasMaxLength(150)
                     .HasColumnName("vat");
+                
+                entity.Property(e => e.Website)
+                    .HasMaxLength(150)
+                    .HasColumnName("website");
 
                 entity.HasOne(d => d.City)
                     .WithMany()
@@ -1099,6 +1104,47 @@ namespace Qerp.DBContext
                     .HasForeignKey(d => d.CountryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_provinces_countries");
+            });
+
+            modelBuilder.Entity<Saveditem>(entity =>
+            {
+                entity.ToTable("saveditems");
+
+                entity.HasIndex(e => e.UserId, "FK_saveditems_users");
+
+                entity.HasIndex(e => e.Id, "id")
+                    .IsUnique();
+
+                entity.Property(e => e.Id)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("id");
+
+                entity.Property(e => e.ApptypeId)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("apptypeId");
+
+                entity.Property(e => e.Created)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created")
+                    .HasDefaultValueSql("current_timestamp()");
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(255)
+                    .HasColumnName("name");
+
+                entity.Property(e => e.Routelink)
+                    .HasMaxLength(255)
+                    .HasColumnName("routelink");
+
+                entity.Property(e => e.UserId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("userId");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Saveditems)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_saveditems_users");
             });
 
             modelBuilder.Entity<Models.Task>(entity =>

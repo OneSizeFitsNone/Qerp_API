@@ -7,6 +7,11 @@ namespace Qerp.Models
 {
     public partial class User
     {
+        public User()
+        {
+            Saveditems = new HashSet<Saveditem>();
+        }
+
         public long Id { get; set; }
         public long CompanyId { get; set; }
         public long ContactId { get; set; }
@@ -18,5 +23,6 @@ namespace Qerp.Models
 
         public virtual Company Company { get; set; }
         public virtual Contact Contact { get; set; }
+        public virtual ICollection<Saveditem> Saveditems { get; set; }
     }
 }

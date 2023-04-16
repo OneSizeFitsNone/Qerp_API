@@ -14,6 +14,24 @@ namespace Qerp.Services
             _memoryCache = memoryCache;
         }
 
+        public long GetUserByToken(string token)
+        {
+            if (token is null) return 0;
+
+            token = token.Replace("Bearer ", "");
+            var memory = _memoryCache.Get<CurrentUser>(token);
+
+            if (memory != null)
+            {
+                return memory.UserId;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+
         public long GetCompanyByToken(string token)
         {
             if(token is null) return 0;
@@ -31,7 +49,7 @@ namespace Qerp.Services
             }
         }
 
-        public bool SetTokenCompany(string token, long companyId)
+        public bool SetToken(string token, long companyId, long userId)
         {
             try
             {
@@ -44,7 +62,7 @@ namespace Qerp.Services
                         .SetAbsoluteExpiration(TimeSpan.FromDays(1))
                         .SetSize(1);
 
-                    _memoryCache.Set(token, new CurrentUser { CompanyId = companyId }, cacheOptions);
+                    _memoryCache.Set(token, new CurrentUser { CompanyId = companyId, UserId = userId }, cacheOptions);
                 }
                 return true;
             }

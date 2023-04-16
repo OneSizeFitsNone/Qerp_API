@@ -25,20 +25,20 @@ namespace Qerp.Controllers
         public IConfiguration _configuration;
         public long _companyId;
         private CurrentUserMM _currentUser;
+        private string _token;
 
         public UserController(IConfiguration config, IMemoryCache memoryCache, IHttpContextAccessor httpContextAccessor)
         {
             _configuration = config;
             _currentUser = new CurrentUserMM(memoryCache);
-            var token = httpContextAccessor.HttpContext.GetTokenAsync("access_token").GetAwaiter().GetResult();
-            _companyId = _currentUser.GetCompanyByToken(token);
+            _token = httpContextAccessor.HttpContext.GetTokenAsync("access_token").GetAwaiter().GetResult();
+            _companyId = _currentUser.GetCompanyByToken(_token);
         }
 
         [HttpGet]
         public async Task<ReturnResult> GetAll()
         {
             return await UserMV.SelectAll(_companyId);
-            
         }
 
         [HttpGet("{id}")]
@@ -107,7 +107,7 @@ namespace Qerp.Controllers
                     Token oToken = new Token();
                     oToken.TokenString = sToken;
 
-                    _currentUser.SetTokenCompany(sToken, user.CompanyId);
+                    _currentUser.SetToken(sToken, user.CompanyId, user.Id);
 
                     return new ReturnResult(true, "", user);
                 }
