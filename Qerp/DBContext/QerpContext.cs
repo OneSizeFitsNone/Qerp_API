@@ -882,6 +882,17 @@ namespace Qerp.DBContext
                     .HasMaxLength(50)
                     .HasColumnName("systemcode");
 
+                entity.Property(e => e.Created)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created")
+                    .HasDefaultValueSql("current_timestamp()");
+
+                entity.Property(e => e.Updated)
+                    .HasColumnType("datetime")
+                    .ValueGeneratedOnAddOrUpdate()
+                    .HasColumnName("updated")
+                    .HasDefaultValueSql("current_timestamp()");
+
                 entity.HasOne(d => d.Company)
                     .WithMany()
                     .HasForeignKey(d => d.CompanyId)

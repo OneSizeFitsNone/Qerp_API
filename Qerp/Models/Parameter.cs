@@ -18,6 +18,8 @@ namespace Qerp.Models
         public string Name { get; set; }
         public string Systemcode { get; set; }
         public string Description { get; set; }
+        public DateTime Created { get; set; }
+        public DateTime Updated { get; set; }
 
         public virtual Company Company { get; set; }
         public virtual Parametergroup Group { get; set; }
