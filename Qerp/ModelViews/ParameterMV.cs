@@ -6,15 +6,17 @@ using Qerp.Services;
 
 namespace Qerp.ModelViews
 {
-    public class ProspectMV : Prospect
+    public class ParameterMV: Parameter
     {
-        public static async Task<ReturnResult> SelectById(long id, long companyId)
+        public ParameterMV() { }
+
+        public static async Task<ReturnResult> GetById(long companyId, long id)
         {
             try
             {
                 using QerpContext db = new QerpContext();
-                Prospect oProspect = await db.Prospects.FirstAsync(c => c.Id == id && c.CompanyId == companyId);
-                return new ReturnResult(true, "", oProspect);
+                Parameter? parameter = await db.Parameters.FirstOrDefaultAsync(p => p.Id == id && (p.CompanyId == -1 || p.CompanyId == companyId));
+                return new ReturnResult(true, "", parameter);
             }
             catch (Exception ex)
             {
@@ -22,16 +24,18 @@ namespace Qerp.ModelViews
             }
         }
 
-        public static async Task<ReturnResult> SelectAll(long companyId)
+        public static async Task<ReturnResult> GetByGroupId(long companyId, long id)
         {
             try
             {
                 using QerpContext db = new QerpContext();
-                List<Prospect> lstProspect = await db.Prospects
-                    .Where(c => c.CompanyId == companyId)
-                    .OrderBy(c => c.Number)
+                List<Parameter> parameters = await db.Parameters
+                    .Where(p => 
+                        p.GroupId == id &&
+                        (p.CompanyId == -1 || p.CompanyId == companyId)
+                    )
                     .ToListAsync();
-                return new ReturnResult(true, "", lstProspect);
+                return new ReturnResult(true, "", parameters);
             }
             catch (Exception ex)
             {
@@ -46,7 +50,8 @@ namespace Qerp.ModelViews
                 using QerpContext db = new QerpContext();
                 db.Add(this);
                 await db.SaveChangesAsync();
-                return new ReturnResult(true, "", this);
+                ReturnResult result = await ParameterMV.GetById(this.CompanyId, this.Id);
+                return new ReturnResult(true, "", result.Object);
             }
             catch (Exception ex)
             {
@@ -62,7 +67,8 @@ namespace Qerp.ModelViews
                 using QerpContext db = new QerpContext();
                 db.Entry(this).State = EntityState.Modified;
                 await db.SaveChangesAsync();
-                return new ReturnResult(true, "", this);
+                ReturnResult result = await ParameterMV.GetById(this.CompanyId, this.Id);
+                return new ReturnResult(true, "", result.Object);
             }
             catch (Exception ex)
             {
@@ -70,7 +76,6 @@ namespace Qerp.ModelViews
 
             }
         }
-
 
         public async Task<ReturnResult> Delete()
         {
@@ -86,5 +91,7 @@ namespace Qerp.ModelViews
                 return new ReturnResult(false, ex.Message, null);
             }
         }
+
+
     }
 }

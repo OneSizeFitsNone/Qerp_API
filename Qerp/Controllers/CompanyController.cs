@@ -28,11 +28,11 @@ namespace Qerp.Controllers
         }
 
 #warning CompanyController GetAllCompanies only on superuser
-        [HttpGet]
-        public async Task<ReturnResult> GetAll()
-        {
-            return await CompanyMV.SelectAll();
-        }
+        //[HttpGet]
+        //public async Task<ReturnResult> GetAll()
+        //{
+        //    return await CompanyMV.SelectAll();
+        //}
 
         [HttpGet("{id}")]
         public async Task<ReturnResult> Get(long id)
@@ -42,11 +42,11 @@ namespace Qerp.Controllers
         }
 
 #warning CompanyController Post only on superuser
-        [HttpPost]
-        public async Task<ReturnResult> Post(CompanyMV company)
-        {
-            return await company.Insert();
-        }
+        //[HttpPost]
+        //public async Task<ReturnResult> Post(CompanyMV company)
+        //{
+        //    return await company.Insert();
+        //}
 
         [HttpPut]
         public async Task<ReturnResult> Put(CompanyMV company)

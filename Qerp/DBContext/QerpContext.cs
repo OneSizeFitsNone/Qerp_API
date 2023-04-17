@@ -30,6 +30,8 @@ namespace Qerp.DBContext
         public virtual DbSet<Models.Image> Images { get; set; }
         public virtual DbSet<Invoice> Invoices { get; set; }
         public virtual DbSet<Invoiceline> Invoicelines { get; set; }
+        public virtual DbSet<Parameter> Parameters { get; set; }
+        public virtual DbSet<Parametergroup> Parametergroups { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<Projectcontact> Projectcontacts { get; set; }
         public virtual DbSet<Prospect> Prospects { get; set; }
@@ -387,6 +389,22 @@ namespace Qerp.DBContext
                 entity.Property(e => e.Phone)
                     .HasMaxLength(150)
                     .HasColumnName("phone");
+
+                entity.Property(e => e.ProjectNumber)
+                    .HasMaxLength(50)
+                    .HasColumnName("projectNumber");
+
+                entity.Property(e => e.ProjectPrefix)
+                    .HasMaxLength(50)
+                    .HasColumnName("projectPrefix");
+
+                entity.Property(e => e.ProspectNumber)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("prospectNumber");
+
+                entity.Property(e => e.ProspectPrefix)
+                    .HasMaxLength(50)
+                    .HasColumnName("prospectPrefix");
 
                 entity.Property(e => e.Updated)
                     .HasColumnType("datetime")
@@ -829,9 +847,89 @@ namespace Qerp.DBContext
                     .HasConstraintName("FK_invoicelines_tasks");
             });
 
+            modelBuilder.Entity<Parameter>(entity =>
+            {
+                entity.ToTable("parameters");
+
+                entity.HasIndex(e => e.CompanyId, "FK_parameters_companies");
+
+                entity.HasIndex(e => e.GroupId, "FK_parameters_parametergroups");
+
+                entity.HasIndex(e => e.Id, "id")
+                    .IsUnique();
+
+                entity.Property(e => e.Id)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("id");
+
+                entity.Property(e => e.CompanyId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("companyId");
+
+                entity.Property(e => e.Description)
+                    .HasMaxLength(255)
+                    .HasColumnName("description");
+
+                entity.Property(e => e.GroupId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("groupId");
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(100)
+                    .HasColumnName("name");
+
+                entity.Property(e => e.Systemcode)
+                    .HasMaxLength(50)
+                    .HasColumnName("systemcode");
+
+                entity.HasOne(d => d.Company)
+                    .WithMany()
+                    .HasForeignKey(d => d.CompanyId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_parameters_companies");
+
+                entity.HasOne(d => d.Group)
+                    .WithMany()
+                    .HasForeignKey(d => d.GroupId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_parameters_parametergroups");
+            });
+
+            modelBuilder.Entity<Parametergroup>(entity =>
+            {
+                entity.ToTable("parametergroups");
+
+                entity.HasIndex(e => e.Id, "id")
+                    .IsUnique();
+
+                entity.Property(e => e.Id)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("id");
+
+                entity.Property(e => e.CanEdit)
+                    .HasColumnType("bit(1)")
+                    .HasColumnName("canEdit");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("name");
+
+                entity.Property(e => e.Sort)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("sort");
+
+                entity.Property(e => e.Systemcode)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnName("systemcode");
+            });
+
             modelBuilder.Entity<Project>(entity =>
             {
                 entity.ToTable("projects");
+
+                entity.HasIndex(e => e.ProspectId, "FK_projects_prospects");
 
                 entity.HasIndex(e => new { e.ApptypeId, e.Id }, "aptype_id_UN")
                     .IsUnique();
@@ -869,10 +967,6 @@ namespace Qerp.DBContext
                     .HasMaxLength(255)
                     .HasColumnName("description");
 
-                entity.Property(e => e.IsProspect)
-                    .HasColumnType("bit(1)")
-                    .HasColumnName("isProspect");
-
                 entity.Property(e => e.Name)
                     .HasMaxLength(100)
                     .HasColumnName("name");
@@ -880,6 +974,10 @@ namespace Qerp.DBContext
                 entity.Property(e => e.Number)
                     .HasColumnType("bigint(20)")
                     .HasColumnName("number");
+
+                entity.Property(e => e.ProspectId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("prospectId");
 
                 entity.Property(e => e.Updated)
                     .HasColumnType("datetime")
@@ -898,6 +996,11 @@ namespace Qerp.DBContext
                     .HasForeignKey(d => d.CompanyId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_projects_companies");
+
+                entity.HasOne(d => d.Prospect)
+                    .WithMany()
+                    .HasForeignKey(d => d.ProspectId)
+                    .HasConstraintName("FK_projects_prospects");
             });
 
             modelBuilder.Entity<Projectcontact>(entity =>
@@ -963,16 +1066,28 @@ namespace Qerp.DBContext
             {
                 entity.ToTable("prospects");
 
+                entity.HasIndex(e => e.ClientId, "FK_prospects_clients");
+
+                entity.HasIndex(e => e.CompanyId, "FK_prospects_companies");
+
+                entity.HasIndex(e => e.ProspectTypeId, "FK_prospects_prospecttypes");
+
                 entity.HasIndex(e => e.ContactId, "contactId");
 
                 entity.HasIndex(e => e.Id, "id")
                     .IsUnique();
 
-                entity.HasIndex(e => e.ProjectId, "projectId");
-
                 entity.Property(e => e.Id)
                     .HasColumnType("bigint(20)")
                     .HasColumnName("id");
+
+                entity.Property(e => e.ClientId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("clientId");
+
+                entity.Property(e => e.CompanyId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("companyId");
 
                 entity.Property(e => e.ContactId)
                     .HasColumnType("bigint(20)")
@@ -995,9 +1110,13 @@ namespace Qerp.DBContext
                     .HasColumnType("int(11)")
                     .HasColumnName("estimatedBuget");
 
-                entity.Property(e => e.ProjectId)
+                entity.Property(e => e.Number)
+                    .HasMaxLength(50)
+                    .HasColumnName("number");
+
+                entity.Property(e => e.ProspectTypeId)
                     .HasColumnType("bigint(20)")
-                    .HasColumnName("projectId");
+                    .HasColumnName("prospectTypeId");
 
                 entity.Property(e => e.Updated)
                     .HasColumnType("datetime")
@@ -1005,17 +1124,29 @@ namespace Qerp.DBContext
                     .HasColumnName("updated")
                     .HasDefaultValueSql("current_timestamp()");
 
+                entity.HasOne(d => d.Client)
+                    .WithMany()
+                    .HasForeignKey(d => d.ClientId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_prospects_clients");
+
+                entity.HasOne(d => d.Company)
+                    .WithMany()
+                    .HasForeignKey(d => d.CompanyId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_prospects_companies");
+
                 entity.HasOne(d => d.Contact)
                     .WithMany()
                     .HasForeignKey(d => d.ContactId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_prospects_contacts");
 
-                entity.HasOne(d => d.Project)
+                entity.HasOne(d => d.ProspectType)
                     .WithMany()
-                    .HasForeignKey(d => d.ProjectId)
+                    .HasForeignKey(d => d.ProspectTypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__projects");
+                    .HasConstraintName("FK_prospects_prospecttypes");
             });
 
             modelBuilder.Entity<Prospectgoal>(entity =>

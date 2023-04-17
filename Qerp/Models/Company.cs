@@ -30,6 +30,10 @@ namespace Qerp.Models
         public string Iban { get; set; }
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
+        public string ProspectPrefix { get; set; }
+        public long? ProspectNumber { get; set; }
+        public string ProjectPrefix { get; set; }
+        public string ProjectNumber { get; set; }
 
         public virtual City City { get; set; }
         public virtual City InvoiceCity { get; set; }

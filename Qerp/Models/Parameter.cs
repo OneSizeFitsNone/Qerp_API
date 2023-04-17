@@ -5,27 +5,21 @@ using System.Collections.Generic;
 
 namespace Qerp.Models
 {
-    public partial class Project
+    public partial class Parameter
     {
-        public Project()
+        public Parameter()
         {
+
         }
 
         public long Id { get; set; }
-        public long ApptypeId { get; set; }
+        public long GroupId { get; set; }
         public long CompanyId { get; set; }
-        public long ClientId { get; set; }
-        public long? ProspectId { get; set; }
-        public long? Number { get; set; }
         public string Name { get; set; }
+        public string Systemcode { get; set; }
         public string Description { get; set; }
-        public DateTime Created { get; set; }
-        public DateTime Updated { get; set; }
 
-        public virtual Client Client { get; set; }
         public virtual Company Company { get; set; }
-        public virtual Prospect Prospect { get; set; }
-
-
+        public virtual Parametergroup Group { get; set; }
     }
 }

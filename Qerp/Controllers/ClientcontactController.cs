@@ -23,17 +23,17 @@ namespace Qerp.Controllers
             _companyId = currentUser.GetCompanyByToken(token);
         }
 
-        [HttpGet]
-        public async Task<ReturnResult> GetAll()
-        {
-            return await ClientcontactMV.SelectAll();
-        }
+        //[HttpGet]
+        //public async Task<ReturnResult> GetAll()
+        //{
+        //    return await ClientcontactMV.SelectAll();
+        //}
 
-        [HttpGet("{id}")]
-        public async Task<ReturnResult> Get(long id)
-        {
-            return await ClientcontactMV.SelectById(id);
-        }
+        //[HttpGet("{id}")]
+        //public async Task<ReturnResult> Get(long id)
+        //{
+        //    return await ClientcontactMV.SelectById(id);
+        //}
 
         [HttpGet("GetByContact/{id}")]
         public async Task<ReturnResult> GetByContact(long id)
