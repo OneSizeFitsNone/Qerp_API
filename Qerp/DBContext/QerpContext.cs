@@ -869,7 +869,7 @@ namespace Qerp.DBContext
                 entity.Property(e => e.Description)
                     .HasMaxLength(255)
                     .HasColumnName("description");
-
+                 
                 entity.Property(e => e.GroupId)
                     .HasColumnType("bigint(20)")
                     .HasColumnName("groupId");

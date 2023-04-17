@@ -41,6 +41,8 @@ namespace Qerp.Controllers
             }
             else
             {
+                if (parameter.CompanyId == -1) { return new ReturnResult(false, "Access Denied", null); }
+
                 parameter.CompanyId = _companyId;
                 return await parameter.Insert();
             }
@@ -53,7 +55,7 @@ namespace Qerp.Controllers
             return await parameter.Delete();
         }
 
-        [HttpGet("GetByGroupId/{id}")]
+        [HttpGet("GetByGroupId")]
         public async Task<ReturnResult> GetByGroupId(long id)
         {
             return await ParameterMV.GetByGroupId(_companyId, id);

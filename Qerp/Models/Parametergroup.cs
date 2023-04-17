@@ -9,7 +9,6 @@ namespace Qerp.Models
     {
         public Parametergroup()
         {
-            Parameters = new HashSet<Parameter>();
         }
 
         public long Id { get; set; }
@@ -18,6 +17,5 @@ namespace Qerp.Models
         public int Sort { get; set; }
         public ulong? CanEdit { get; set; }
 
-        public virtual ICollection<Parameter> Parameters { get; set; }
     }
 }

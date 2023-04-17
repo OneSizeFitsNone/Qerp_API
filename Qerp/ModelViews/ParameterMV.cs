@@ -3,6 +3,7 @@ using Qerp.DBContext;
 using Qerp.Interfaces;
 using Qerp.Models;
 using Qerp.Services;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Qerp.ModelViews
 {
@@ -30,10 +31,11 @@ namespace Qerp.ModelViews
             {
                 using QerpContext db = new QerpContext();
                 List<Parameter> parameters = await db.Parameters
-                    .Where(p => 
-                        p.GroupId == id &&
-                        (p.CompanyId == -1 || p.CompanyId == companyId)
+                    .Where(p =>
+                        (p.CompanyId == -1 || p.CompanyId == companyId) &&
+                        p.GroupId == id                        
                     )
+                    .OrderBy(p => p.Name)
                     .ToListAsync();
                 return new ReturnResult(true, "", parameters);
             }
