@@ -45,10 +45,35 @@ namespace Qerp.ModelViews
             }
         }
 
+        public static async Task<ReturnResult> GetByGroupSystemCode(long companyId, string syscode)
+        {
+            try
+            {
+                using QerpContext db = new QerpContext();
+                List<Parameter> parameters = await db.Parameters
+                    .Where(p =>
+                        (p.CompanyId == -1 || p.CompanyId == companyId) &&
+                        p.Systemcode == syscode
+                    )
+                    .OrderBy(p => p.Name)
+                    .ToListAsync();
+                return new ReturnResult(true, "", parameters);
+            }
+            catch (Exception ex)
+            {
+                return new ReturnResult(false, ex.Message, null);
+            }
+        }
+
         public async Task<ReturnResult> Insert()
         {
             try
             {
+                if (!await ParametergroupMV.IsEditable(this.GroupId))
+                {
+                    return new ReturnResult(false, "Access Denied", null);
+                }
+
                 using QerpContext db = new QerpContext();
                 db.Add(this);
                 await db.SaveChangesAsync();
@@ -66,6 +91,11 @@ namespace Qerp.ModelViews
         {
             try
             {
+                if(!await ParametergroupMV.IsEditable(this.GroupId))
+                {
+                    return new ReturnResult(false, "Access Denied", null);
+                }
+
                 using QerpContext db = new QerpContext();
                 db.Entry(this).State = EntityState.Modified;
                 await db.SaveChangesAsync();

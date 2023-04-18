@@ -61,6 +61,12 @@ namespace Qerp.Controllers
             return await ParameterMV.GetByGroupId(_companyId, id);
         }
 
+        [HttpGet("getByGroupSystemCode")]
+        public async Task<ReturnResult> GetByGroupSystemCode(string syscode)
+        {
+            return await ParameterMV.GetByGroupSystemCode(_companyId, syscode);
+        }
+
         [HttpGet("GetGroups")]
         public async Task<ReturnResult> GetGroups()
         {

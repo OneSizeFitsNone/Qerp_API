@@ -15,7 +15,7 @@ namespace Qerp.Models
         public string Name { get; set; }
         public string Systemcode { get; set; }
         public int Sort { get; set; }
-        public ulong? CanEdit { get; set; }
+        public bool CanEdit { get; set; }
 
     }
 }

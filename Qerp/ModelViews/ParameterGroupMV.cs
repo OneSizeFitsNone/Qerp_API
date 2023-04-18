@@ -7,6 +7,25 @@ namespace Qerp.ModelViews
 {
     public class ParametergroupMV: Parametergroup
     {
+
+        public static async Task<bool> IsEditable(long id)
+        {
+            try
+            {
+                using QerpContext db = new QerpContext();
+                Parametergroup parametergroup = await db.Parametergroups.FirstOrDefaultAsync(x => x.Id == id);
+                if (parametergroup != null)
+                {
+                    return parametergroup.CanEdit;
+                }
+                else { return false; }
+            }
+            catch {
+                return false;
+            }
+            
+        }
+
         public static async Task<ReturnResult> GetAll()
         {
             try
