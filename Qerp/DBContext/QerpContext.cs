@@ -20,6 +20,7 @@ namespace Qerp.DBContext
         }
 
         public virtual DbSet<Apptype> Apptypes { get; set; }
+        public virtual DbSet<Apptypecontact> Apptypecontacts { get; set; }
         public virtual DbSet<City> Cities { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<Clientcontact> Clientcontacts { get; set; }
@@ -82,6 +83,111 @@ namespace Qerp.DBContext
                 entity.Property(e => e.Number)
                     .HasColumnType("int(11)")
                     .HasColumnName("number");
+            });
+
+            modelBuilder.Entity<Apptypecontact>(entity =>
+            {
+                entity.ToTable("apptypecontacts");
+
+                entity.HasIndex(e => e.ClientId, "FK_apptypecontacts_clients");
+
+                entity.HasIndex(e => e.CompanyId, "FK_apptypecontacts_companies");
+
+                entity.HasIndex(e => e.ContactroleId, "FK_apptypecontacts_contactroles");
+
+                entity.HasIndex(e => e.ContactId, "FK_apptypecontacts_contacts");
+
+                entity.HasIndex(e => new { e.ApptypeId, e.LinkedId }, "FK_apptypecontacts_tasks");
+
+                entity.HasIndex(e => e.Id, "id")
+                    .IsUnique();
+
+                entity.Property(e => e.Id)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("id");
+
+                entity.Property(e => e.ApptypeId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("apptypeId");
+
+                entity.Property(e => e.ClientId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("clientId");
+
+                entity.Property(e => e.CompanyId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("companyId");
+
+                entity.Property(e => e.ContactId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("contactId");
+
+                entity.Property(e => e.ContactroleId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("contactroleId");
+
+                entity.Property(e => e.Created)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created")
+                    .HasDefaultValueSql("current_timestamp()");
+
+                entity.Property(e => e.Description)
+                    .HasMaxLength(255)
+                    .HasColumnName("description");
+
+                entity.Property(e => e.LinkedId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("linkedId");
+
+                entity.Property(e => e.Updated)
+                    .HasColumnType("datetime")
+                    .ValueGeneratedOnAddOrUpdate()
+                    .HasColumnName("updated")
+                    .HasDefaultValueSql("current_timestamp()");
+
+                entity.HasOne(d => d.Client)
+                    .WithMany()
+                    .HasForeignKey(d => d.ClientId)
+                    .HasConstraintName("FK_apptypecontacts_clients");
+
+                entity.HasOne(d => d.Company)
+                    .WithMany()
+                    .HasForeignKey(d => d.CompanyId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_apptypecontacts_companies");
+
+                entity.HasOne(d => d.Contact)
+                    .WithMany()
+                    .HasForeignKey(d => d.ContactId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_apptypecontacts_contacts");
+
+                entity.HasOne(d => d.Contactrole)
+                    .WithMany()
+                    .HasForeignKey(d => d.ContactroleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_apptypecontacts_contactroles");
+
+                entity.HasOne(d => d.Project)
+                    .WithMany()
+                    .HasPrincipalKey(p => new { p.ApptypeId, p.Id })
+                    .HasForeignKey(d => new { d.ApptypeId, d.LinkedId })
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_apptypecontacts_projects");
+
+                entity.HasOne(d => d.Task)
+                    .WithMany()
+                    .HasPrincipalKey(p => new { p.ApptypeId, p.Id })
+                    .HasForeignKey(d => new { d.ApptypeId, d.LinkedId })
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_apptypecontacts_tasks");
+
+                entity.HasOne(d => d.Prospect)
+                    .WithMany()
+                    .HasPrincipalKey(p => new { p.Id, p.ApptypeId })
+                    .HasForeignKey(d => new { d.LinkedId, d.ApptypeId })
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_apptypecontacts_prospects");
             });
 
             modelBuilder.Entity<City>(entity =>
