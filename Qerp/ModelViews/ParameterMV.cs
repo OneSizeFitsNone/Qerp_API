@@ -53,7 +53,7 @@ namespace Qerp.ModelViews
                 List<Parameter> parameters = await db.Parameters
                     .Where(p =>
                         (p.CompanyId == -1 || p.CompanyId == companyId) &&
-                        p.Systemcode == syscode
+                        p.Group.Systemcode == syscode
                     )
                     .OrderBy(p => p.Name)
                     .ToListAsync();

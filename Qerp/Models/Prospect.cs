@@ -13,13 +13,13 @@ namespace Qerp.Models
         }
         public long Id { get; set; }
         public long CompanyId { get; set; }
-        public long ClientId { get; set; }
-        public long ContactId { get; set; }
-        public long ProspectTypeId { get; set; }
+        public long? ClientId { get; set; }
+        public long? ContactId { get; set; }
+        public long? ProspectTypeId { get; set; }
         public string Number { get; set; }
         public DateTime? Deadline { get; set; }
         public string Description { get; set; }
-        public int? EstimatedBuget { get; set; }
+        public int? EstimatedBudget { get; set; }
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
 

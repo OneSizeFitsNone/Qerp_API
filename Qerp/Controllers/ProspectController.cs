@@ -51,13 +51,17 @@ namespace Qerp.Controllers
             }
         }
 
-
-
         [HttpDelete]
         public async Task<ReturnResult> Delete(ProspectMV prospect)
         {
             if (_companyId != prospect.CompanyId) { new ReturnResult(false, "Access Denied", null); }
             return await prospect.Delete();
+        }
+
+        [HttpPost("search")]
+        public async Task<ReturnResult> Search(ProspectMV prospect)
+        {
+            return await prospect.Search(_companyId);
         }
     }
 }

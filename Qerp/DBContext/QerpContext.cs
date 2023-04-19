@@ -1117,9 +1117,9 @@ namespace Qerp.DBContext
                     .HasColumnType("text")
                     .HasColumnName("description");
 
-                entity.Property(e => e.EstimatedBuget)
+                entity.Property(e => e.EstimatedBudget)
                     .HasColumnType("int(11)")
-                    .HasColumnName("estimatedBuget");
+                    .HasColumnName("estimatedBudget");
 
                 entity.Property(e => e.Number)
                     .HasMaxLength(50)

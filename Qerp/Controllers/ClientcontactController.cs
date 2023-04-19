@@ -29,11 +29,11 @@ namespace Qerp.Controllers
         //    return await ClientcontactMV.SelectAll();
         //}
 
-        //[HttpGet("{id}")]
-        //public async Task<ReturnResult> Get(long id)
-        //{
-        //    return await ClientcontactMV.SelectById(id);
-        //}
+        [HttpGet("{id}")]
+        public async Task<ReturnResult> Get(long id)
+        {
+            return await ClientcontactMV.SelectById(id);
+        }
 
         [HttpGet("GetByContact/{id}")]
         public async Task<ReturnResult> GetByContact(long id)
