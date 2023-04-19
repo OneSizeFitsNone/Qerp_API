@@ -8,12 +8,12 @@ namespace Qerp.ModelViews
 {
     public class ApptypecontactMV : Apptypecontact
     {
-        public static async Task<ReturnResult> SelectById(long id)
+        public static async Task<ReturnResult> SelectById(long companyId, long id)
         {
             try
             {
                 using QerpContext db = new QerpContext();
-                Apptypecontact oApptypecontact = 
+                Apptypecontact? oApptypecontact = 
                     await db.Apptypecontacts
                         .Include(c => c.Client)
                         .ThenInclude(cc => cc.City)
@@ -24,10 +24,8 @@ namespace Qerp.ModelViews
                         .ThenInclude(ccc => ccc.Province)
                         .ThenInclude(cccp => cccp.Country)
                         .Include(c => c.Contactrole)
-                        .Include(c => c.Project)
-                        .Include(c => c.Task)
-                        .Include(c => c.Prospect)
-                        .FirstAsync(c => c.Id == id);
+
+                        .FirstOrDefaultAsync(c => c.Id == id);
                 return new ReturnResult(true, "", oApptypecontact);
             }
             catch (Exception ex)
@@ -88,7 +86,7 @@ namespace Qerp.ModelViews
                 db.Add(this);
                 await db.SaveChangesAsync();
 
-                return await ApptypecontactMV.SelectById(this.Id);
+                return await ApptypecontactMV.SelectById(this.CompanyId, this.Id);
             }
             catch (Exception ex)
             {
@@ -104,7 +102,7 @@ namespace Qerp.ModelViews
                 using QerpContext db = new QerpContext();
                 db.Entry(this).State = EntityState.Modified;
                 await db.SaveChangesAsync();
-                return await ApptypecontactMV.SelectById(this.Id);
+                return await ApptypecontactMV.SelectById(this.CompanyId, this.Id);
             }
             catch (Exception ex)
             {

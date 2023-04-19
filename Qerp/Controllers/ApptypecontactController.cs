@@ -6,6 +6,8 @@ using Qerp.Interfaces;
 using Qerp.Models;
 using Qerp.ModelViews;
 using Qerp.Services;
+using System.Data.Common;
+using System.Reflection.Metadata;
 
 namespace Qerp.Controllers
 {
@@ -26,7 +28,7 @@ namespace Qerp.Controllers
         [HttpGet("{id}")]
         public async Task<ReturnResult> Get(long id)
         {
-            return await ApptypecontactMV.SelectById(id);
+            return await ApptypecontactMV.SelectById(_companyId, id);
         }
 
         [HttpGet("SelectByApptypeLinkedId")]
@@ -40,10 +42,12 @@ namespace Qerp.Controllers
         {
             if (apptypecontact.Id != 0)
             {
+                if (_companyId != apptypecontact.CompanyId) { return new ReturnResult(false, "Access Denied", null); }
                 return await apptypecontact.Update();
             }
             else
             {
+                apptypecontact.CompanyId = _companyId;
                 return await apptypecontact.Insert();
             }
         }
@@ -52,6 +56,7 @@ namespace Qerp.Controllers
         [HttpDelete]
         public async Task<ReturnResult> Delete(ApptypecontactMV apptypecontact)
         {
+            if (_companyId != apptypecontact.CompanyId) { return new ReturnResult(false, "Access Denied", null); }
             return await apptypecontact.Delete();
         }
     }

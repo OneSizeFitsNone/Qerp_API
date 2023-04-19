@@ -658,7 +658,6 @@ namespace Qerp.DBContext
                 entity.HasOne(d => d.Company)
                     .WithMany()
                     .HasForeignKey(d => d.CompanyId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_contactroles_companies");
             });
 
