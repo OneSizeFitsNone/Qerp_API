@@ -123,6 +123,11 @@ namespace Qerp.Controllers
             }
         }
 
+        [HttpGet("IsLoggedIn")]
+        public async Task<bool> IsLoggedIn()
+        {
+            return this._companyId > 0 ? true : false;
+        }
 
         //private async Task<User?> GetUser(string username, string password)
         //{
