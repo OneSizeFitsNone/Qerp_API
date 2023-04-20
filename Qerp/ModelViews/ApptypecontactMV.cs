@@ -3,6 +3,7 @@ using Qerp.DBContext;
 using Qerp.Interfaces;
 using Qerp.Models;
 using Qerp.Services;
+using System.Runtime.CompilerServices;
 
 namespace Qerp.ModelViews
 {
@@ -48,6 +49,41 @@ namespace Qerp.ModelViews
             }
         }
 
+        public static async Task<ReturnResult> SelectBySource(long companyId, long apptypeId, long linkedId, long requestedType)
+        {
+            try
+            {
+                using QerpContext db = new QerpContext();
+                List<Apptypecontact> lstApptypecontacts = await db.Apptypecontacts
+                    .Include(c => c.Client)
+                    .ThenInclude(cc => cc.City)
+                    .ThenInclude(ccc => ccc.Province)
+                    .ThenInclude(cccp => cccp.Country)
+                    .Include(c => c.Contact)
+                    .ThenInclude(cc => cc.City)
+                    .ThenInclude(ccc => ccc.Province)
+                    .ThenInclude(cccp => cccp.Country)
+                    .Include(c => c.Contactrole)
+                    .Include(c => c.Project)
+                    .Include(c => c.Task)
+                    .Include(c => c.Prospect)
+                    .Where(cc => 
+                        cc.CompanyId == companyId &&
+                        cc.ApptypeId == requestedType &&
+                        (
+                            (apptypeId == AppTypeMV.Contact && cc.ContactId == linkedId) ||
+                            (apptypeId == AppTypeMV.Client && cc.ClientId == linkedId)
+                        )
+                     )
+                    .OrderBy(cc => cc.Client.Name)
+                    .ToListAsync();
+                return new ReturnResult(true, "", lstApptypecontacts);
+            }
+            catch (Exception ex)
+            {
+                return new ReturnResult(false, ex.Message, null);
+            }
+        }
 
         public static async Task<ReturnResult> SelectByApptypeLinkedId(long companyId, long apptypeId, long linkedId)
         {

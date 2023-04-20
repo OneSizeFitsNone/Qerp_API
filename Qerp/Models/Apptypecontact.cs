@@ -7,8 +7,8 @@ namespace Qerp.Models
     {
         public long Id { get; set; }
         public long CompanyId { get; set; }
-        public long ApptypeId { get; set; }
-        public long LinkedId { get; set; }
+        public long? ApptypeId { get; set; }
+        public long? LinkedId { get; set; }
         public long? ContactId { get; set; }
         public long? ClientId { get; set; }
         public long? ContactroleId { get; set; }

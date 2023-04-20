@@ -31,6 +31,12 @@ namespace Qerp.Controllers
             return await ApptypecontactMV.SelectById(_companyId, id);
         }
 
+        [HttpGet("SelectBySource")]
+        public async Task<ReturnResult> SelectBySource(long apptypeId, long linkedId, long requestedType)
+        {
+            return await ApptypecontactMV.SelectBySource(this._companyId, apptypeId, linkedId, requestedType);
+        }
+
         [HttpGet("SelectByApptypeLinkedId")]
         public async Task<ReturnResult> SelectByApptypeLinkedId(long apptypeId, long linkedId)
         {
