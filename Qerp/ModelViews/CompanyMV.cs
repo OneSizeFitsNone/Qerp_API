@@ -13,7 +13,14 @@ namespace Qerp.ModelViews
             try
             {
                 using QerpContext db = new QerpContext();
-                CompanyMV oCompanyMV = ObjectManipulation.CastObject<CompanyMV>(await db.Companies.FirstAsync(c => c.Id == id));
+                Company oCompanyMV = await db.Companies
+                    .Include(c => c.City)
+                    .ThenInclude(cc => cc.Province)
+                    .ThenInclude(p => p.Country)
+                    .Include(c => c.InvoiceCity)
+                    .ThenInclude(ic => ic.Province)
+                    .ThenInclude(p => p.Country)
+                    .FirstAsync(c => c.Id == id);
                 return new ReturnResult(true, "", oCompanyMV);
             }
             catch (Exception ex)

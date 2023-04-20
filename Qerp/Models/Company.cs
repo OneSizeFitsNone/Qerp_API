@@ -21,6 +21,8 @@ namespace Qerp.Models
         public long? CityId { get; set; }
         public string Description { get; set; }
         public string Email { get; set; }
+        public string Website { get; set; }
+        public ulong? InvoiceSameAddress { get; set; }
         public string InvoiceAddress { get; set; }
         public long? InvoiceCityId { get; set; }
         public string InvoiceEmail { get; set; }
@@ -33,7 +35,7 @@ namespace Qerp.Models
         public string ProspectPrefix { get; set; }
         public long? ProspectNumber { get; set; }
         public string ProjectPrefix { get; set; }
-        public string ProjectNumber { get; set; }
+        public long? ProjectNumber { get; set; }
 
         public virtual City City { get; set; }
         public virtual City InvoiceCity { get; set; }

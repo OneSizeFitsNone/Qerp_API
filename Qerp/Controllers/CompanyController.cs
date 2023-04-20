@@ -34,10 +34,9 @@ namespace Qerp.Controllers
         //    return await CompanyMV.SelectAll();
         //}
 
-        [HttpGet("{id}")]
-        public async Task<ReturnResult> Get(long id)
+        [HttpGet]
+        public async Task<ReturnResult> Get()
         {
-            if (_companyId != id) { new ReturnResult(false, "Access Denied", null); }
             return await CompanyMV.SelectById(_companyId);
         }
 
@@ -48,8 +47,8 @@ namespace Qerp.Controllers
         //    return await company.Insert();
         //}
 
-        [HttpPut]
-        public async Task<ReturnResult> Put(CompanyMV company)
+        [HttpPost]
+        public async Task<ReturnResult> Post(CompanyMV company)
         {
             if (_companyId != company.Id) { new ReturnResult(false, "Access Denied", null); }
             return await company.Update();

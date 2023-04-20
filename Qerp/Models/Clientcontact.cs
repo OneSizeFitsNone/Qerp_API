@@ -10,7 +10,7 @@ namespace Qerp.Models
         public long Id { get; set; }
         public long ClientId { get; set; }
         public long ContactId { get; set; }
-        public long ContactroleId { get; set; }
+        public long? ContactroleId { get; set; }
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
 

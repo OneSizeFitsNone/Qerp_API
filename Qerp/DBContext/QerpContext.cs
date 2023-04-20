@@ -153,40 +153,35 @@ namespace Qerp.DBContext
                 entity.HasOne(d => d.Company)
                     .WithMany()
                     .HasForeignKey(d => d.CompanyId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_apptypecontacts_companies");
 
                 entity.HasOne(d => d.Contact)
                     .WithMany()
                     .HasForeignKey(d => d.ContactId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_apptypecontacts_contacts");
 
                 entity.HasOne(d => d.Contactrole)
                     .WithMany()
                     .HasForeignKey(d => d.ContactroleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("FK_apptypecontacts_contactroles");
 
                 entity.HasOne(d => d.Project)
                     .WithMany()
                     .HasPrincipalKey(p => new { p.ApptypeId, p.Id })
                     .HasForeignKey(d => new { d.ApptypeId, d.LinkedId })
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_apptypecontacts_projects");
 
                 entity.HasOne(d => d.Task)
                     .WithMany()
                     .HasPrincipalKey(p => new { p.ApptypeId, p.Id })
                     .HasForeignKey(d => new { d.ApptypeId, d.LinkedId })
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_apptypecontacts_tasks");
 
                 entity.HasOne(d => d.Prospect)
                     .WithMany()
                     .HasPrincipalKey(p => new { p.Id, p.ApptypeId })
                     .HasForeignKey(d => new { d.LinkedId, d.ApptypeId })
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_apptypecontacts_prospects");
             });
 
@@ -454,6 +449,10 @@ namespace Qerp.DBContext
                     .HasColumnType("bigint(20)")
                     .HasColumnName("cityId");
 
+                entity.Property(e => e.InvoiceSameAddress)
+                    .HasColumnType("bit(1)")
+                    .HasColumnName("invoiceSameAddress");
+
                 entity.Property(e => e.Created)
                     .HasColumnType("datetime")
                     .HasColumnName("created")
@@ -466,6 +465,10 @@ namespace Qerp.DBContext
                 entity.Property(e => e.Email)
                     .HasMaxLength(150)
                     .HasColumnName("email");
+                
+                entity.Property(e => e.Website)
+                    .HasMaxLength(255)
+                    .HasColumnName("website");
 
                 entity.Property(e => e.Iban)
                     .HasMaxLength(50)
@@ -497,7 +500,7 @@ namespace Qerp.DBContext
                     .HasColumnName("phone");
 
                 entity.Property(e => e.ProjectNumber)
-                    .HasMaxLength(50)
+                    .HasColumnType("bigint(20)")
                     .HasColumnName("projectNumber");
 
                 entity.Property(e => e.ProjectPrefix)
