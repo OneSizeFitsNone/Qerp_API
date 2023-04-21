@@ -1191,14 +1191,24 @@ namespace Qerp.DBContext
 
                 entity.HasIndex(e => e.ProspectTypeId, "FK_prospects_prospecttypes");
 
+                entity.HasIndex(e => e.ApptypeId, "apptypeId");
+
                 entity.HasIndex(e => e.ContactId, "contactId");
 
                 entity.HasIndex(e => e.Id, "id")
                     .IsUnique();
 
+                entity.HasIndex(e => new { e.Id, e.ApptypeId }, "id_apptypeId")
+                    .IsUnique();
+
                 entity.Property(e => e.Id)
                     .HasColumnType("bigint(20)")
                     .HasColumnName("id");
+
+                entity.Property(e => e.ApptypeId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("apptypeId")
+                    .HasDefaultValueSql("'45000'");
 
                 entity.Property(e => e.ClientId)
                     .HasColumnType("bigint(20)")

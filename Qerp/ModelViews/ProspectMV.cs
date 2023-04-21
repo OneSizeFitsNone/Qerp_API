@@ -77,6 +77,14 @@ namespace Qerp.ModelViews
                 db.Add(this);
                 await db.SaveChangesAsync();
 
+                ApptypecontactMV apptypecontactMV = new ApptypecontactMV();
+                apptypecontactMV.CompanyId = this.CompanyId;
+                apptypecontactMV.ApptypeId = AppTypeMV.Prospect;
+                apptypecontactMV.LinkedId = this.Id;
+                apptypecontactMV.ContactId = this.ContactId;
+                apptypecontactMV.ClientId = this.ClientId;
+                await apptypecontactMV.Insert();
+                
                 await company.Update();
                 return new ReturnResult(true, "", this);
             }

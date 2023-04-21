@@ -28,8 +28,8 @@ namespace Qerp.Models
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
 
-        public virtual City City { get; set; }
-        public virtual Company Company { get; set; }
+        public virtual City? City { get; set; }
+        public virtual Company? Company { get; set; }
 
         public virtual ICollection<Models.Image> Images { get; set; }
 
