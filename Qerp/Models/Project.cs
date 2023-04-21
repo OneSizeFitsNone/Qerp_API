@@ -14,16 +14,21 @@ namespace Qerp.Models
         public long Id { get; set; }
         public long ApptypeId { get; set; }
         public long CompanyId { get; set; }
-        public long ClientId { get; set; }
+        public long? ClientId { get; set; }
+        public long? ContactId { get; set; }
+        public long? ProjectTypeId { get; set; }
         public long? ProspectId { get; set; }
-        public long? Number { get; set; }
+        public string Number { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public DateTime? Deadline { get; set; }
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
 
         public virtual Client Client { get; set; }
         public virtual Company Company { get; set; }
+        public virtual Contact Contact { get; set; }
+        public virtual Parameter ProjectType { get; set; }
         public virtual Prospect Prospect { get; set; }
 
 

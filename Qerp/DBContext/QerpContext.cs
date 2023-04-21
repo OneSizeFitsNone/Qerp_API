@@ -1048,6 +1048,10 @@ namespace Qerp.DBContext
             {
                 entity.ToTable("projects");
 
+                entity.HasIndex(e => e.ContactId, "FK_projects_contacts");
+
+                entity.HasIndex(e => e.ProjectTypeId, "FK_projects_projecttypes");
+
                 entity.HasIndex(e => e.ProspectId, "FK_projects_prospects");
 
                 entity.HasIndex(e => new { e.ApptypeId, e.Id }, "aptype_id_UN")
@@ -1081,6 +1085,10 @@ namespace Qerp.DBContext
                     .HasColumnType("datetime")
                     .HasColumnName("created")
                     .HasDefaultValueSql("current_timestamp()");
+                
+                entity.Property(e => e.Deadline)
+                    .HasColumnType("datetime")
+                    .HasColumnName("deadline");
 
                 entity.Property(e => e.Description)
                     .HasMaxLength(255)
@@ -1091,8 +1099,12 @@ namespace Qerp.DBContext
                     .HasColumnName("name");
 
                 entity.Property(e => e.Number)
-                    .HasColumnType("bigint(20)")
+                    .HasMaxLength(50)
                     .HasColumnName("number");
+
+                entity.Property(e => e.ProjectTypeId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("projectTypeId");
 
                 entity.Property(e => e.ProspectId)
                     .HasColumnType("bigint(20)")
@@ -1115,6 +1127,11 @@ namespace Qerp.DBContext
                     .HasForeignKey(d => d.CompanyId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_projects_companies");
+
+                entity.HasOne(d => d.ProjectType)
+                    .WithMany()
+                    .HasForeignKey(d => d.ProjectTypeId)
+                    .HasConstraintName("FK_projects_projecttypes");
 
                 entity.HasOne(d => d.Prospect)
                     .WithMany()

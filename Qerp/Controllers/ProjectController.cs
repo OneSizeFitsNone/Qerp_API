@@ -1,7 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Qerp.Interfaces;
+using Qerp.Models;
 using Qerp.ModelViews;
+using Qerp.Services;
+using System.Threading.Tasks;
 
 namespace Qerp.Controllers
 {
@@ -12,9 +17,11 @@ namespace Qerp.Controllers
     {
         public long _companyId;
 
-        public ProjectController(IConfiguration config, IHttpContextAccessor httpContextAccessor)
+        public ProjectController(IMemoryCache memoryCache, IHttpContextAccessor httpContextAccessor)
         {
-            _companyId = Convert.ToInt64(httpContextAccessor.HttpContext?.Session.GetString("companyId") ?? "0");
+            var currentUser = new CurrentUserMM(memoryCache);
+            var token = httpContextAccessor.HttpContext.GetTokenAsync("access_token").GetAwaiter().GetResult();
+            _companyId = currentUser.GetCompanyByToken(token);
         }
 
         [HttpGet]
@@ -32,15 +39,16 @@ namespace Qerp.Controllers
         [HttpPost]
         public async Task<ReturnResult> Post(ProjectMV project)
         {
-            if (_companyId != project.CompanyId) { new ReturnResult(false, "Access Denied", null); }
-            return await project.Insert();
-        }
-
-        [HttpPut]
-        public async Task<ReturnResult> Put(ProjectMV project)
-        {
-            if (_companyId != project.CompanyId) { new ReturnResult(false, "Access Denied", null); }
-            return await project.Update();
+            if (project.Id != 0)
+            {
+                if (_companyId != project.CompanyId) { return new ReturnResult(false, "Access Denied", null); }
+                return await project.Update();
+            }
+            else
+            {
+                project.CompanyId = _companyId;
+                return await project.Insert();
+            }
         }
 
         [HttpDelete]
@@ -48,6 +56,12 @@ namespace Qerp.Controllers
         {
             if (_companyId != project.CompanyId) { new ReturnResult(false, "Access Denied", null); }
             return await project.Delete();
+        }
+
+        [HttpPost("search")]
+        public async Task<ReturnResult> Search(ProjectMV project)
+        {
+            return await project.Search(_companyId);
         }
     }
 }
