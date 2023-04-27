@@ -39,6 +39,7 @@ namespace Qerp.ModelViews
 
         public DateTime? DeadlineFrom;
         public DateTime? DeadlineTo;
+        public string? TypeNumber;
 
         public static async Task<ReturnResult> SelectByApptype(long appTypeId, long id, long companyId)
         {
@@ -148,6 +149,48 @@ namespace Qerp.ModelViews
                 return new ReturnResult(false, ex.Message, null);
             }
         }
+
+        public async Task<ReturnResult> Search(long companyId)
+        {
+            try
+            {
+                using QerpContext db = new QerpContext();
+                List<Milestone> milestones = await db.Milestones
+                    .Include(m => m.Prospect)
+                    .Include(m => m.Project)
+
+                    
+                    .Where(c =>
+                        c.CompanyId == companyId &&
+                        (this.Name == null || c.Name.Contains(this.Name)) &&
+                        (this.LinkedapptypeId == null || c.LinkedapptypeId == this.LinkedapptypeId) &&
+                        (this.LinkedtypeId == null || c.LinkedtypeId == this.LinkedtypeId) &&
+                        (this.Description == null || c.Description.Contains(this.Description)) &&
+                        (this.Completed == null || c.Completed == this.Completed) &&
+                        (this.DeadlineFrom == null || c.Deadline >= this.DeadlineFrom) &&
+                        (this.DeadlineTo == null || c.Deadline <= this.DeadlineTo)
+                    )
+                    .OrderBy(p => p.Deadline)
+                    .ToListAsync();
+
+                List<MilestoneMV> lstMilestones = ObjectManipulation.CastObject<List<MilestoneMV>>(milestones);
+
+                if (milestones.Count == 0)
+                {
+                    return new ReturnResult(false, "warn.noresultsfound", null);
+                }
+                else
+                {
+                    return new ReturnResult(true, "", lstMilestones);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new ReturnResult(false, ex.Message, null);
+            }
+        }
+
 
     }
 }

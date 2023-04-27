@@ -65,5 +65,11 @@ namespace Qerp.Controllers
             return await milestone.Delete();
         }
 
+        [HttpPost("search")]
+        public async Task<ReturnResult> Search(MilestoneMV milestone)
+        {
+            return await milestone.Search(_companyId);
+        }
+
     }
 }

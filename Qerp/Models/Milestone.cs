@@ -14,12 +14,14 @@ namespace Qerp.Models
         public long Id { get; set; }
         public long CompanyId { get; set; }
         public long ApptypeId { get; set; }
-        public long LinkedapptypeId { get; set; }
-        public long LinkedtypeId { get; set; }
+        public long? LinkedapptypeId { get; set; }
+        public long? LinkedtypeId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public DateTime? Deadline { get; set; }
         public ulong? Completed { get; set; }
+        public DateTime Created { get; set; }
+        public DateTime Updated { get; set; }
 
         public virtual Company Company { get; set; }
         public virtual Project Project { get; set; }

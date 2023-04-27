@@ -1003,6 +1003,17 @@ namespace Qerp.DBContext
                     .HasMaxLength(255)
                     .HasColumnName("name");
 
+                entity.Property(e => e.Created)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created")
+                    .HasDefaultValueSql("current_timestamp()");
+
+                entity.Property(e => e.Updated)
+                    .HasColumnType("datetime")
+                    .ValueGeneratedOnAddOrUpdate()
+                    .HasColumnName("updated")
+                    .HasDefaultValueSql("current_timestamp()");
+
                 entity.HasOne(d => d.Company)
                     .WithMany()
                     .HasForeignKey(d => d.CompanyId)
@@ -1155,7 +1166,13 @@ namespace Qerp.DBContext
                     .HasColumnType("datetime")
                     .HasColumnName("created")
                     .HasDefaultValueSql("current_timestamp()");
-                
+
+                entity.Property(e => e.Updated)
+                    .HasColumnType("datetime")
+                    .ValueGeneratedOnAddOrUpdate()
+                    .HasColumnName("updated")
+                    .HasDefaultValueSql("current_timestamp()");
+
                 entity.Property(e => e.Deadline)
                     .HasColumnType("datetime")
                     .HasColumnName("deadline");
@@ -1179,12 +1196,6 @@ namespace Qerp.DBContext
                 entity.Property(e => e.ProspectId)
                     .HasColumnType("bigint(20)")
                     .HasColumnName("prospectId");
-
-                entity.Property(e => e.Updated)
-                    .HasColumnType("datetime")
-                    .ValueGeneratedOnAddOrUpdate()
-                    .HasColumnName("updated")
-                    .HasDefaultValueSql("current_timestamp()");
 
                 entity.HasOne(d => d.Client)
                     .WithMany()
