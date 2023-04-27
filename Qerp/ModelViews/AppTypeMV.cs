@@ -9,5 +9,6 @@
         public static long Prospect    = 45000;
         public static long Project     = 50000;
         public static long Task        = 60000;
+        public static long Milestone   = 70000;
     }
 }

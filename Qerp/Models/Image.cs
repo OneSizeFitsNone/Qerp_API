@@ -8,7 +8,7 @@ namespace Qerp.Models
     public partial class Image
     {
         public long Id { get; set; }
-        public long ApptypeId { get; set; }
+        public long LinkedapptypeId { get; set; }
         public long LinkedtypeId { get; set; }
         public string Description { get; set; }
         public string Extension { get; set; }

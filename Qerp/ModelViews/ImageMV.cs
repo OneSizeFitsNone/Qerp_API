@@ -21,7 +21,7 @@ namespace Qerp.ModelViews
                 using QerpContext db = new QerpContext();
                 List<ImageMV> oImageMV = ObjectManipulation.CastObject<List<ImageMV>>(
                     await db.Images
-                        .Where(i => i.ApptypeId == appTypeId && i.LinkedtypeId == linkedTypeId)
+                        .Where(i => i.LinkedapptypeId == appTypeId && i.LinkedtypeId == linkedTypeId)
                         .OrderBy(i => i.Sort)
                         .ToListAsync()
                 );

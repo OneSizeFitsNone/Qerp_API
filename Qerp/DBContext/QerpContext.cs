@@ -31,12 +31,12 @@ namespace Qerp.DBContext
         public virtual DbSet<Models.Image> Images { get; set; }
         public virtual DbSet<Invoice> Invoices { get; set; }
         public virtual DbSet<Invoiceline> Invoicelines { get; set; }
+        public virtual DbSet<Milestone> Milestones { get; set; }
         public virtual DbSet<Parameter> Parameters { get; set; }
         public virtual DbSet<Parametergroup> Parametergroups { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<Projectcontact> Projectcontacts { get; set; }
         public virtual DbSet<Prospect> Prospects { get; set; }
-        public virtual DbSet<Prospectgoal> Prospectgoals { get; set; }
         public virtual DbSet<Province> Provinces { get; set; }
         public virtual DbSet<Saveditem> Saveditems { get; set; }
         public virtual DbSet<Models.Task> Tasks { get; set; }
@@ -712,15 +712,15 @@ namespace Qerp.DBContext
                 entity.HasIndex(e => e.Id, "id")
                     .IsUnique();
 
-                entity.HasIndex(e => new { e.ApptypeId, e.LinkedtypeId }, "tasks_FK");
+                entity.HasIndex(e => new { e.LinkedapptypeId, e.LinkedtypeId }, "tasks_FK");
 
                 entity.Property(e => e.Id)
                     .HasColumnType("bigint(20)")
                     .HasColumnName("id");
 
-                entity.Property(e => e.ApptypeId)
+                entity.Property(e => e.LinkedapptypeId)
                     .HasColumnType("bigint(20)")
-                    .HasColumnName("apptypeId");
+                    .HasColumnName("linkedapptypeId");
 
                 entity.Property(e => e.Created)
                     .HasColumnType("datetime")
@@ -764,7 +764,7 @@ namespace Qerp.DBContext
                 entity.HasOne(d => d.Client)
                     .WithMany(p => p.Images)
                     .HasPrincipalKey(p => new { p.ApptypeId, p.Id })
-                    .HasForeignKey(d => new { d.ApptypeId, d.LinkedtypeId })
+                    .HasForeignKey(d => new { d.LinkedapptypeId, d.LinkedtypeId })
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("clients_FK");
 
@@ -778,7 +778,7 @@ namespace Qerp.DBContext
                 entity.HasOne(d => d.Contact)
                     .WithMany(p => p.Images)
                     .HasPrincipalKey(p => new { p.ApptypeId, p.Id })
-                    .HasForeignKey(d => new { d.ApptypeId, d.LinkedtypeId })
+                    .HasForeignKey(d => new { d.LinkedapptypeId, d.LinkedtypeId })
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("contacts_FK");
 
@@ -954,6 +954,76 @@ namespace Qerp.DBContext
                     .HasForeignKey(d => d.TaskId)
                     .HasConstraintName("FK_invoicelines_tasks");
             });
+
+            modelBuilder.Entity<Milestone>(entity =>
+            {
+                entity.ToTable("milestones");
+
+                entity.HasIndex(e => e.CompanyId, "FK_milestones_companies");
+
+                entity.HasIndex(e => new { e.LinkedapptypeId, e.LinkedtypeId }, "FK_milestones_projects");
+
+                entity.HasIndex(e => e.Id, "id")
+                    .IsUnique();
+
+                entity.Property(e => e.Id)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("id");
+
+                entity.Property(e => e.ApptypeId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("apptypeId")
+                    .HasDefaultValueSql("'70000'");
+
+                entity.Property(e => e.CompanyId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("companyId");
+
+                entity.Property(e => e.Completed)
+                    .HasColumnType("bit(1)")
+                    .HasColumnName("completed");
+
+                entity.Property(e => e.Deadline)
+                    .HasColumnType("datetime")
+                    .HasColumnName("deadline");
+
+                entity.Property(e => e.Description)
+                    .HasColumnType("text")
+                    .HasColumnName("description");
+
+                entity.Property(e => e.LinkedapptypeId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("linkedapptypeId");
+
+                entity.Property(e => e.LinkedtypeId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("linkedtypeId");
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(255)
+                    .HasColumnName("name");
+
+                entity.HasOne(d => d.Company)
+                    .WithMany()
+                    .HasForeignKey(d => d.CompanyId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_milestones_companies");
+
+                entity.HasOne(d => d.Project)
+                    .WithMany()
+                    .HasPrincipalKey(p => new { p.ApptypeId, p.Id })
+                    .HasForeignKey(d => new { d.LinkedapptypeId, d.LinkedtypeId })
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_milestones_projects");
+
+                entity.HasOne(d => d.Prospect)
+                    .WithMany()
+                    .HasPrincipalKey(p => new { p.Id, p.ApptypeId })
+                    .HasForeignKey(d => new { d.LinkedtypeId, d.LinkedapptypeId })
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_milestones_prospects");
+            });
+
 
             modelBuilder.Entity<Parameter>(entity =>
             {
@@ -1295,49 +1365,6 @@ namespace Qerp.DBContext
                     .HasConstraintName("FK_prospects_prospecttypes");
             });
 
-            modelBuilder.Entity<Prospectgoal>(entity =>
-            {
-                entity.ToTable("prospectgoals");
-
-                entity.HasIndex(e => e.Id, "id")
-                    .IsUnique();
-
-                entity.HasIndex(e => e.ProspectId, "prospectId");
-
-                entity.Property(e => e.Id)
-                    .HasColumnType("bigint(20)")
-                    .HasColumnName("id");
-
-                entity.Property(e => e.Created)
-                    .HasColumnType("datetime")
-                    .HasColumnName("created")
-                    .HasDefaultValueSql("current_timestamp()");
-
-                entity.Property(e => e.Deadline)
-                    .HasColumnType("datetime")
-                    .HasColumnName("deadline");
-
-                entity.Property(e => e.Description)
-                    .HasMaxLength(255)
-                    .HasColumnName("description");
-
-                entity.Property(e => e.ProspectId)
-                    .HasColumnType("bigint(20)")
-                    .HasColumnName("prospectId");
-
-                entity.Property(e => e.Updated)
-                    .HasColumnType("datetime")
-                    .ValueGeneratedOnAddOrUpdate()
-                    .HasColumnName("updated")
-                    .HasDefaultValueSql("current_timestamp()");
-
-                entity.HasOne(d => d.Prospect)
-                    .WithMany()
-                    .HasForeignKey(d => d.ProspectId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_prospectgoals_prospects");
-            });
-
             modelBuilder.Entity<Province>(entity =>
             {
                 entity.ToTable("provinces");
@@ -1428,6 +1455,8 @@ namespace Qerp.DBContext
             {
                 entity.ToTable("tasks");
 
+                entity.HasIndex(e => e.MilestoneId, "FK_tasks_milestones");
+
                 entity.HasIndex(e => new { e.ApptypeId, e.Id }, "apptype_id_UN")
                     .IsUnique();
 
@@ -1441,8 +1470,6 @@ namespace Qerp.DBContext
                     .IsUnique();
 
                 entity.HasIndex(e => e.ProjectId, "projectId");
-
-                entity.HasIndex(e => e.ProspectGoalId, "prospectGoalId");
 
                 entity.HasIndex(e => e.ProspectId, "prospectId");
 
@@ -1487,13 +1514,13 @@ namespace Qerp.DBContext
 
                 entity.Property(e => e.MaxTime).HasColumnName("maxTime");
 
+                entity.Property(e => e.MilestoneId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("milestoneId");
+
                 entity.Property(e => e.ProjectId)
                     .HasColumnType("bigint(20)")
                     .HasColumnName("projectId");
-
-                entity.Property(e => e.ProspectGoalId)
-                    .HasColumnType("bigint(20)")
-                    .HasColumnName("prospectGoalId");
 
                 entity.Property(e => e.ProspectId)
                     .HasColumnType("bigint(20)")
@@ -1519,7 +1546,6 @@ namespace Qerp.DBContext
                 entity.HasOne(d => d.Client)
                     .WithMany()
                     .HasForeignKey(d => d.ClientId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_tasks_clients");
 
                 entity.HasOne(d => d.Company)
@@ -1531,19 +1557,17 @@ namespace Qerp.DBContext
                 entity.HasOne(d => d.Contact)
                     .WithMany()
                     .HasForeignKey(d => d.ContactId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_tasks_contacts");
+
+                entity.HasOne(d => d.Milestone)
+                    .WithMany()
+                    .HasForeignKey(d => d.MilestoneId)
+                    .HasConstraintName("FK_tasks_milestones");
 
                 entity.HasOne(d => d.Project)
                     .WithMany()
                     .HasForeignKey(d => d.ProjectId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_tasks_projects");
-
-                entity.HasOne(d => d.ProspectGoal)
-                    .WithMany()
-                    .HasForeignKey(d => d.ProspectGoalId)
-                    .HasConstraintName("FK_tasks_prospectgoals");
 
                 entity.HasOne(d => d.Prospect)
                     .WithMany()
