@@ -49,6 +49,27 @@ namespace Qerp.ModelViews
             }
         }
 
+        public static async Task<Apptypecontact> SelectByApptypeContactClient(long companyId, long appTypeId, long linkedId, long? contactId, long? clientId)
+        {
+            try
+            {
+                using QerpContext db = new QerpContext();
+
+                return await db.Apptypecontacts.Where(at => 
+                    at.CompanyId == companyId &&
+                    at.ApptypeId == appTypeId &&
+                    at.LinkedId == linkedId &&
+                    at.ContactId == contactId &&
+                    at.ClientId == clientId
+                ).FirstOrDefaultAsync();
+            }
+            catch
+            {
+                return null;
+            }
+            
+        }
+
         public static async Task<ReturnResult> SelectBySource(long companyId, long apptypeId, long linkedId, long requestedType)
         {
             try

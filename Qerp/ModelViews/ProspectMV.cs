@@ -102,6 +102,21 @@ namespace Qerp.ModelViews
                 using QerpContext db = new QerpContext();
                 db.Entry(this).State = EntityState.Modified;
                 await db.SaveChangesAsync();
+
+                if(
+                    this.ContactId != null && this.ClientId != null &&
+                    (await ApptypecontactMV.SelectByApptypeContactClient(this.CompanyId, AppTypeMV.Prospect, this.Id, this.ContactId, this.ClientId) == null)
+                )
+                {
+                    ApptypecontactMV apptypecontactMV = new ApptypecontactMV();
+                    apptypecontactMV.CompanyId = this.CompanyId;
+                    apptypecontactMV.ApptypeId = AppTypeMV.Prospect;
+                    apptypecontactMV.LinkedId = this.Id;
+                    apptypecontactMV.ContactId = this.ContactId;
+                    apptypecontactMV.ClientId = this.ClientId;
+                    await apptypecontactMV.Insert();
+                }
+
                 return new ReturnResult(true, "", this);
             }
             catch (Exception ex)

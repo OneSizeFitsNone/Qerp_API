@@ -70,6 +70,14 @@ namespace Qerp.ModelViews
             {
                 using QerpContext db = new QerpContext();
                 Milestone? oMilestone = await db.Milestones
+                    .Include(c => c.Prospect)
+                    .ThenInclude(c => c.Client)
+                    .Include(c => c.Prospect)
+                    .ThenInclude(c => c.Contact)
+                    .Include(c => c.Project)
+                    .ThenInclude(c => c.Client)
+                    .Include(c => c.Project)
+                    .ThenInclude(c => c.Contact)
                     .Where(c =>
                         c.CompanyId == companyId &&
                         c.Id == id
