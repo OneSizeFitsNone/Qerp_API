@@ -2,18 +2,31 @@
 using Qerp.DBContext;
 using Qerp.Interfaces;
 using Qerp.Services;
+using Qerp.Models;
 
 namespace Qerp.ModelViews
 {
     public class TaskMV : Models.Task
     {
+
+        public long? ForcedId;
+        public DateTime? DeadlineFrom;
+        public DateTime? DeadlineTo;
+        public long? SearchAppType;
+
         public static async Task<ReturnResult> SelectById(long id, long companyId)
         {
             try
             {
                 using QerpContext db = new QerpContext();
-                TaskMV oTaskMV = ObjectManipulation.CastObject<TaskMV>(await db.Tasks.FirstAsync(c => c.Id == id && c.CompanyId == companyId));
-                return new ReturnResult(true, "", oTaskMV);
+                Models.Task oTask = await db.Tasks
+                    .Include(t => t.Contact)
+                    .Include(t => t.Client)
+                    .Include(t => t.Prospect)
+                    .Include(t => t.Project)
+                    .Include(t => t.Milestone)
+                    .FirstAsync(c => c.Id == id && c.CompanyId == companyId);
+                return new ReturnResult(true, "", oTask);
             }
             catch (Exception ex)
             {
@@ -35,14 +48,53 @@ namespace Qerp.ModelViews
             }
         }
 
-        public async Task<ReturnResult> Insert()
+        public static async Task<ReturnResult> SelectByApptype(long companyId, long apptypeId, long id)
         {
             try
             {
                 using QerpContext db = new QerpContext();
+                List<Models.Task> lstTasks = await db.Tasks
+                    .Include(t => t.Contact)
+                    .Include(t => t.Client)
+                    .Include(t => t.Prospect)
+                    .Include(t => t.Project)
+                    .Include(t => t.Milestone)
+                    .Where(t => t.CompanyId == companyId &&
+                        (
+                            (apptypeId == AppTypeMV.Milestone && t.MilestoneId == id) ||
+                            (apptypeId == AppTypeMV.Prospect && t.ProspectId == id) ||
+                            (apptypeId == AppTypeMV.Project && t.ProjectId == id) ||
+                            (apptypeId == AppTypeMV.Contact && t.ContactId == id) ||
+                            (apptypeId == AppTypeMV.Client && t.ClientId == id)
+                        )
+                    )
+                    .OrderBy(t => t.Deadline)
+                    .ToListAsync();
+                
+                return new ReturnResult(true, "", lstTasks);
+            }
+            catch (Exception ex)
+            {
+                return new ReturnResult(false, ex.Message, null);
+            }
+        }
+
+        public async Task<ReturnResult> Insert()
+        {
+            try
+            {
+                if(this.MilestoneId != null)
+                {
+                    if(!await this.HandleMilestoneTask())
+                    {
+                        return new ReturnResult(false, "err.milestonehandler", null);
+                    }
+                }
+
+                using QerpContext db = new QerpContext();
                 db.Add(this);
                 await db.SaveChangesAsync();
-                return new ReturnResult(true, "", this);
+                return await TaskMV.SelectById(this.Id, this.CompanyId);
             }
             catch (Exception ex)
             {
@@ -58,11 +110,40 @@ namespace Qerp.ModelViews
                 using QerpContext db = new QerpContext();
                 db.Entry(this).State = EntityState.Modified;
                 await db.SaveChangesAsync();
-                return new ReturnResult(true, "", this);
+                return await TaskMV.SelectById(this.Id, this.CompanyId);
             }
             catch (Exception ex)
             {
                 return new ReturnResult(false, ex.Message, null);
+
+            }
+        }
+
+        private async Task<bool> HandleMilestoneTask()
+        {
+            try {
+                using QerpContext db = new QerpContext();
+                Milestone? milestone = await db.Milestones.FirstOrDefaultAsync(ms => ms.Id == this.MilestoneId);
+                if(milestone == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    if(milestone.LinkedapptypeId == AppTypeMV.Project)
+                    {
+                        this.ProjectId = milestone.LinkedtypeId;
+                    }
+                    else if(milestone.LinkedapptypeId == AppTypeMV.Prospect)
+                    {
+                        this.ProspectId = milestone.LinkedtypeId;
+                    }
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
 
             }
         }
@@ -82,5 +163,65 @@ namespace Qerp.ModelViews
                 return new ReturnResult(false, ex.Message, null);
             }
         }
+
+        public async Task<ReturnResult> Search(long companyId)
+        {
+            try
+            {
+                using QerpContext db = new QerpContext();
+                List<Models.Task> tasks = await db.Tasks
+                    .Include(t => t.Prospect)
+                    .Include(t => t.Project)
+                    .Include(t => t.Milestone)
+                    .Include(t => t.Contact)
+                    .Where(c =>
+                        c.CompanyId == companyId &&
+                        (
+                            (
+                                this.ForcedId != null &&
+                                (c.Id == this.ForcedId || (this.Title != null && (this.Title.Length > 2 && c.Title.StartsWith(this.Title))))
+                            ) ||
+                            (
+                                this.ForcedId == null &&
+                                (this.Title == null || c.Title.Contains(this.Title)) &&
+                                (this.ContactId == null || c.ContactId == this.ContactId) &&
+                                (
+                                    this.SearchAppType == null ||
+                                    (this.SearchAppType == AppTypeMV.Prospect && c.ProspectId != null) ||
+                                    (this.SearchAppType == AppTypeMV.Project && c.ProjectId != null) ||
+                                    (this.SearchAppType == AppTypeMV.Milestone && c.MilestoneId != null)
+                                ) &&
+                                (this.ProspectId == null || c.ProspectId == this.ProspectId) &&
+                                (this.ProjectId == null || c.ProjectId == this.ProjectId) &&
+                                (this.MilestoneId == null || c.MilestoneId == this.MilestoneId) &&
+                                (this.Description == null || c.Description.Contains(this.Description)) &&
+                                (this.Completed == null || c.Completed == this.Completed) &&
+                                (this.ToInvoice == null || c.ToInvoice == this.ToInvoice) &&
+                                (this.DeadlineFrom == null || c.Deadline >= this.DeadlineFrom) &&
+                                (this.DeadlineTo == null || c.Deadline <= this.DeadlineTo)
+                            )
+                        )
+                    )
+                    .OrderBy(p => p.Deadline)
+                    .ToListAsync();
+
+                //List<MilestoneMV> lstMilestones = ObjectManipulation.CastObject<List<MilestoneMV>>(milestones);
+
+                if (tasks.Count == 0 && this.ForcedId == null)
+                {
+                    return new ReturnResult(false, "warn.noresultsfound", null);
+                }
+                else
+                {
+                    return new ReturnResult(true, "", tasks);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new ReturnResult(false, ex.Message, null);
+            }
+        }
+
     }
 }

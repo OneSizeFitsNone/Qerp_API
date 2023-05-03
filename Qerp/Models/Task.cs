@@ -24,7 +24,6 @@ namespace Qerp.Models
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime? Deadline { get; set; }
-        public float? Timer { get; set; }
         public float? MaxTime { get; set; }
         public ulong? ToInvoice { get; set; }
         public ulong? Completed { get; set; }

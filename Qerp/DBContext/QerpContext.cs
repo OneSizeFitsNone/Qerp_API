@@ -1537,8 +1537,6 @@ namespace Qerp.DBContext
                     .HasColumnType("bigint(20)")
                     .HasColumnName("prospectId");
 
-                entity.Property(e => e.Timer).HasColumnName("timer");
-
                 entity.Property(e => e.Title)
                     .IsRequired()
                     .HasMaxLength(255)

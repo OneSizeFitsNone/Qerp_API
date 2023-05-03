@@ -159,5 +159,40 @@ namespace Qerp.ModelViews
             }
         }
 
+        public async Task<ReturnResult> SearchUser(long companyId)
+        {
+            try
+            {
+                using QerpContext db = new QerpContext();
+                List<User> lstUsers = await db.Users
+                        .Include(u => u.Contact)
+                        .Where(c =>
+                            c.CompanyId == companyId &&
+                            (
+                                this.ForcedId != null &&
+                                (c.Id == this.ForcedId || (this.Fullname != null && (this.Fullname.Length > 2 && c.Contact.Fullname.StartsWith(this.Fullname))))
+                            )
+                        )
+                        .ToListAsync();
+
+                List<Contact> lstContacts = lstUsers.Select(c =>  c.Contact).ToList();
+
+
+                if (lstContacts.Count == 0 && this.ForcedId == null)
+                {
+                    return new ReturnResult(false, "warn.noresultsfound", null);
+                }
+                else
+                {
+                    return new ReturnResult(true, "", lstContacts);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new ReturnResult(false, ex.Message, null);
+            }
+        }
+
     }
 }

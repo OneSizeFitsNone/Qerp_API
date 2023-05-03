@@ -61,5 +61,11 @@ namespace Qerp.Controllers
         {
             return await contact.Search(_companyId);
         }
+
+        [HttpPost("searchUser")]
+        public async Task<ReturnResult> SearchUser(ContactMV contact)
+        {
+            return await contact.SearchUser(_companyId);
+        }
     }
 }

@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Qerp.Interfaces;
+using Qerp.Models;
 using Qerp.ModelViews;
+using Qerp.Services;
 
 namespace Qerp.Controllers
 {
@@ -12,9 +16,11 @@ namespace Qerp.Controllers
     {
         public long _companyId;
 
-        public TaskController(IConfiguration config, IHttpContextAccessor httpContextAccessor)
+        public TaskController(IMemoryCache memoryCache, IHttpContextAccessor httpContextAccessor)
         {
-            _companyId = Convert.ToInt64(httpContextAccessor.HttpContext?.Session.GetString("companyId") ?? "0");
+            var currentUser = new CurrentUserMM(memoryCache);
+            var token = httpContextAccessor.HttpContext.GetTokenAsync("access_token").GetAwaiter().GetResult();
+            _companyId = currentUser.GetCompanyByToken(token);
         }
 
         [HttpGet]
@@ -32,15 +38,16 @@ namespace Qerp.Controllers
         [HttpPost]
         public async Task<ReturnResult> Post(TaskMV task)
         {
-            if (_companyId != task.CompanyId) { new ReturnResult(false, "Access Denied", null); }
-            return await task.Insert();
-        }
-
-        [HttpPut]
-        public async Task<ReturnResult> Put(TaskMV task)
-        {
-            if (_companyId != task.CompanyId) { new ReturnResult(false, "Access Denied", null); }
-            return await task.Update();
+            if (task.Id != 0)
+            {
+                if (_companyId != task.CompanyId) { return new ReturnResult(false, "Access Denied", null); }
+                return await task.Update(); 
+            }
+            else
+            {
+                task.CompanyId = _companyId;
+                return await task.Insert();
+            }            
         }
 
         [HttpDelete]
@@ -48,6 +55,18 @@ namespace Qerp.Controllers
         {
             if (_companyId != task.CompanyId) { new ReturnResult(false, "Access Denied", null); }
             return await task.Delete();
+        }
+
+        [HttpGet("SelectByApptype")]
+        public async Task<ReturnResult> SelectByApptype(long apptypeId, long id)
+        {
+            return await TaskMV.SelectByApptype(_companyId, apptypeId, id);
+        }
+
+        [HttpPost("search")]
+        public async Task<ReturnResult> Search(TaskMV task)
+        {
+            return await task.Search(_companyId);
         }
     }
 }

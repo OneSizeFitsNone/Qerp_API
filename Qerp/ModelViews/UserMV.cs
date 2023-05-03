@@ -9,6 +9,7 @@ namespace Qerp.ModelViews
 {
     public class UserMV : User
     {
+
         public static async Task<ReturnResult> SelectById(long id, long companyId)
         {
             try
@@ -127,5 +128,7 @@ namespace Qerp.ModelViews
             using QerpContext db = new QerpContext();
             return 0;
         }
+
+        
     }
 }

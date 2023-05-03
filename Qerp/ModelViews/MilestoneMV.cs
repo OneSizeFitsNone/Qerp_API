@@ -9,37 +9,11 @@ namespace Qerp.ModelViews
 {
     public class MilestoneMV : Milestone
     {
-        public int TaskCount 
-        { 
-            get 
-            {
-                using QerpContext db = new QerpContext();
-                int count = db.Tasks.Where(t => t.MilestoneId == this.Id).Count();
-                return count; 
-            } 
-        }
-
-        public int TasksCompleted
-        {
-            get
-            {
-                using QerpContext db = new QerpContext();
-                int count = db.Tasks.Where(t => t.MilestoneId == this.Id && t.Completed == 1).Count();
-                return count;
-            }
-        }
-
-        public double PercentageCompleted
-        {
-            get
-            {
-                return this.TaskCount > 0 ? (this.TasksCompleted / this.TaskCount * 100) : 0;
-            }
-        }
-
         public DateTime? DeadlineFrom;
         public DateTime? DeadlineTo;
         public string? TypeNumber;
+        
+        public long? ForcedId;
 
         public static async Task<ReturnResult> SelectByApptype(long appTypeId, long id, long companyId)
         {
@@ -166,30 +140,37 @@ namespace Qerp.ModelViews
                 List<Milestone> milestones = await db.Milestones
                     .Include(m => m.Prospect)
                     .Include(m => m.Project)
-
-                    
                     .Where(c =>
                         c.CompanyId == companyId &&
-                        (this.Name == null || c.Name.Contains(this.Name)) &&
-                        (this.LinkedapptypeId == null || c.LinkedapptypeId == this.LinkedapptypeId) &&
-                        (this.LinkedtypeId == null || c.LinkedtypeId == this.LinkedtypeId) &&
-                        (this.Description == null || c.Description.Contains(this.Description)) &&
-                        (this.Completed == null || c.Completed == this.Completed) &&
-                        (this.DeadlineFrom == null || c.Deadline >= this.DeadlineFrom) &&
-                        (this.DeadlineTo == null || c.Deadline <= this.DeadlineTo)
+                        (
+                            (
+                                this.ForcedId != null &&
+                                (c.Id == this.ForcedId || (this.Name != null && (this.Name.Length > 2 && c.Name.StartsWith(this.Name))))
+                            ) ||
+                            (
+                                this.ForcedId == null &&
+                                (this.Name == null || c.Name.Contains(this.Name)) &&
+                                (this.LinkedapptypeId == null || c.LinkedapptypeId == this.LinkedapptypeId) &&
+                                (this.LinkedtypeId == null || c.LinkedtypeId == this.LinkedtypeId) &&
+                                (this.Description == null || c.Description.Contains(this.Description)) &&
+                                (this.Completed == null || c.Completed == this.Completed) &&
+                                (this.DeadlineFrom == null || c.Deadline >= this.DeadlineFrom) &&
+                                (this.DeadlineTo == null || c.Deadline <= this.DeadlineTo)
+                            )
+                        )
                     )
                     .OrderBy(p => p.Deadline)
                     .ToListAsync();
 
-                List<MilestoneMV> lstMilestones = ObjectManipulation.CastObject<List<MilestoneMV>>(milestones);
+                //List<MilestoneMV> lstMilestones = ObjectManipulation.CastObject<List<MilestoneMV>>(milestones);
 
-                if (milestones.Count == 0)
+                if (milestones.Count == 0 && this.ForcedId == null)
                 {
                     return new ReturnResult(false, "warn.noresultsfound", null);
                 }
                 else
                 {
-                    return new ReturnResult(true, "", lstMilestones);
+                    return new ReturnResult(true, "", milestones);
                 }
 
             }
