@@ -148,7 +148,7 @@ namespace Qerp.ModelViews
                                 (
                                     c.Id == this.ForcedId || 
                                     (
-                                        (this.Name != null && this.Name.Length > 2 && c.Name.StartsWith(this.Name)) &&
+                                        (this.Name == null || (this.Name.Length > 2 && c.Name.StartsWith(this.Name))) &&
                                         (this.LinkedapptypeId == null || (c.LinkedapptypeId == this.LinkedapptypeId && c.LinkedtypeId == this.LinkedtypeId))
                                     )
                                 )
