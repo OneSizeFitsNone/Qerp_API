@@ -23,7 +23,13 @@ namespace Qerp.ModelViews
                     .Include(t => t.Contact)
                     .Include(t => t.Client)
                     .Include(t => t.Prospect)
+                    .ThenInclude(p => p.Contact)
+                    .Include(t => t.Prospect)
+                    .ThenInclude(p => p.Client)
                     .Include(t => t.Project)
+                    .ThenInclude(p => p.Contact)
+                    .Include(t => t.Project)
+                    .ThenInclude(p => p.Client)
                     .Include(t => t.Milestone)
                     .FirstAsync(c => c.Id == id && c.CompanyId == companyId);
                 return new ReturnResult(true, "", oTask);
