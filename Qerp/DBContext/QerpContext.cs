@@ -1519,7 +1519,6 @@ namespace Qerp.DBContext
                     .HasColumnName("deadline");
 
                 entity.Property(e => e.Description)
-                    .IsRequired()
                     .HasColumnType("text")
                     .HasColumnName("description");
 

@@ -97,6 +97,24 @@ namespace Qerp.ModelViews
                     }
                 }
 
+                if(this.ProspectId > 0)
+                {
+                    Prospect? oProspect = (Prospect)(await ProspectMV.SelectById(this.ProspectId ?? 0, this.CompanyId)).Object;
+                    if(oProspect != null)
+                    {
+                        this.ClientId = oProspect.ClientId;
+                    }
+                }
+                else if(this.ProjectId > 0)
+                {
+                    Project? oProject = (Project)(await ProjectMV.SelectById(this.ProjectId ?? 0, this.CompanyId)).Object;
+                    if(oProject != null)
+                    {
+                        this.ClientId = oProject.ClientId;
+                    }                    
+                }
+
+
                 using QerpContext db = new QerpContext();
                 db.Add(this);
                 await db.SaveChangesAsync();
@@ -113,6 +131,31 @@ namespace Qerp.ModelViews
         {
             try
             {
+                if (this.MilestoneId != null)
+                {
+                    if (!await this.HandleMilestoneTask())
+                    {
+                        return new ReturnResult(false, "err.milestonehandler", null);
+                    }
+                }
+
+                if (this.ProspectId > 0)
+                {
+                    Prospect? oProspect = (Prospect)(await ProspectMV.SelectById(this.ProspectId ?? 0, this.CompanyId)).Object;
+                    if (oProspect != null)
+                    {
+                        this.ClientId = oProspect.ClientId;
+                    }
+                }
+                else if (this.ProjectId > 0)
+                {
+                    Project? oProject = (Project)(await ProjectMV.SelectById(this.ProjectId ?? 0, this.CompanyId)).Object;
+                    if (oProject != null)
+                    {
+                        this.ClientId = oProject.ClientId;
+                    }
+                }
+
                 using QerpContext db = new QerpContext();
                 db.Entry(this).State = EntityState.Modified;
                 await db.SaveChangesAsync();
