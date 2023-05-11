@@ -182,7 +182,7 @@ namespace Qerp.ModelViews
                             c.CompanyId == companyId &&
                             (
                                 this.ForcedId != null &&
-                                (c.Id == this.ForcedId || (this.Fullname != null && (this.Fullname.Length > 2 && c.Contact.Fullname.StartsWith(this.Fullname))))
+                                (c.ContactId == this.ForcedId || (this.Fullname != null && (this.Fullname.Length > 2 && c.Contact.Fullname.StartsWith(this.Fullname))))
                             )
                         )
                         .ToListAsync();
