@@ -254,7 +254,13 @@ namespace Qerp.ModelViews
                     .OrderBy(p => p.Deadline)
                     .ToListAsync();
 
-                //List<MilestoneMV> lstMilestones = ObjectManipulation.CastObject<List<MilestoneMV>>(milestones);
+                if (this.ForcedId != null && this.ForcedId > 0)
+                {
+                    int i = tasks.FindIndex(c => c.Id == this.ForcedId);
+                    var oTask = tasks[i];
+                    tasks.RemoveAt(i);
+                    tasks.Insert(0, oTask);
+                }
 
                 if (tasks.Count == 0 && this.ForcedId == null)
                 {

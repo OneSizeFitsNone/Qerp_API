@@ -173,6 +173,14 @@ namespace Qerp.ModelViews
                     .OrderBy(p => p.Number)
                     .ToListAsync();
 
+                if (this.ForcedId != null && this.ForcedId > 0)
+                {
+                    int i = prospects.FindIndex(c => c.Id == this.ForcedId);
+                    var oProspect = prospects[i];
+                    prospects.RemoveAt(i);
+                    prospects.Insert(0, oProspect);
+                }
+
                 if (prospects.Count == 0 && this.ForcedId == null)
                 {
                     return new ReturnResult(false, "warn.noresultsfound", null);

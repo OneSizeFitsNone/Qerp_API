@@ -27,6 +27,7 @@ namespace Qerp.ModelViews
                         c.LinkedtypeId == id
                     )
                     .OrderBy(c => c.Deadline)
+                    .ThenBy(c => c.Name)
                     .ToListAsync();
                 List<MilestoneMV>lstMilestoneMV = ObjectManipulation.CastObject<List<MilestoneMV>>(lstMilestone);
                 return new ReturnResult(true, "", lstMilestoneMV);
@@ -168,7 +169,13 @@ namespace Qerp.ModelViews
                     .OrderBy(p => p.Deadline)
                     .ToListAsync();
 
-                //List<MilestoneMV> lstMilestones = ObjectManipulation.CastObject<List<MilestoneMV>>(milestones);
+                if (this.ForcedId != null && this.ForcedId > 0)
+                {
+                    int i = milestones.FindIndex(c => c.Id == this.ForcedId);
+                    var oMilestone = milestones[i];
+                    milestones.RemoveAt(i);
+                    milestones.Insert(0, oMilestone);
+                }
 
                 if (milestones.Count == 0 && this.ForcedId == null)
                 {

@@ -152,8 +152,16 @@ namespace Qerp.ModelViews
                         )
                     )
                     .ToListAsync();
-                
-                if(clients.Count == 0 && this.ForcedId == null)
+
+                if (this.ForcedId != null && this.ForcedId > 0)
+                {
+                    int i = clients.FindIndex(c => c.Id == this.ForcedId);
+                    var oClient = clients[i];
+                    clients.RemoveAt(i);
+                    clients.Insert(0, oClient);
+                }
+
+                if (clients.Count == 0 && this.ForcedId == null)
                 {
                     return new ReturnResult(false, "warn.noresultsfound", null);
                 }

@@ -138,7 +138,19 @@ namespace Qerp.ModelViews
                             )
 
                         )
+                        .OrderBy(c => c.Fullname)
                         .ToListAsync();
+
+                if(this.ForcedId != null && this.ForcedId > 0)
+                {
+                    int i = lstContacts.FindIndex(c => c.Id == this.ForcedId);
+                    var oContact = lstContacts[i];
+                    lstContacts.RemoveAt(i);
+                    lstContacts.Insert(0, oContact);
+                }
+                
+
+
 
                 //List<ContactMV> contacts = ObjectManipulation.CastObject<List<ContactMV>>(
                 //    lstContacts

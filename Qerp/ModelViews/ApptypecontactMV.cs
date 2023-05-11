@@ -55,13 +55,15 @@ namespace Qerp.ModelViews
             {
                 using QerpContext db = new QerpContext();
 
-                return await db.Apptypecontacts.Where(at => 
-                    at.CompanyId == companyId &&
-                    at.ApptypeId == appTypeId &&
-                    at.LinkedId == linkedId &&
-                    at.ContactId == contactId &&
-                    at.ClientId == clientId
-                ).FirstOrDefaultAsync();
+                return await db.Apptypecontacts
+                    .Where(at => 
+                        at.CompanyId == companyId &&
+                        at.ApptypeId == appTypeId &&
+                        at.LinkedId == linkedId &&
+                        at.ContactId == contactId &&
+                        at.ClientId == clientId
+                    )
+                    .FirstOrDefaultAsync();
             }
             catch
             {
@@ -96,7 +98,8 @@ namespace Qerp.ModelViews
                             (apptypeId == AppTypeMV.Client && cc.ClientId == linkedId)
                         )
                      )
-                    .OrderBy(cc => cc.Client.Name)
+                    .OrderBy(cc => cc.Client)
+                    .ThenBy(cc => cc.Contact.Fullname)
                     .ToListAsync();
                 return new ReturnResult(true, "", lstApptypecontacts);
             }
@@ -126,6 +129,7 @@ namespace Qerp.ModelViews
                     //.Include(c => c.Prospect)
                     .Where(cc => cc.ApptypeId == apptypeId && cc.LinkedId == linkedId && cc.CompanyId == companyId)
                     .OrderBy(cc => cc.Client.Name)
+                    .ThenBy(cc => cc.Contact.Fullname)
                     .ToListAsync();
                 return new ReturnResult(true, "", lstApptypecontacts);
             }
