@@ -22,6 +22,7 @@ namespace Qerp.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public DateTime? Deadline { get; set; }
+        public long? StatusId { get; set; }
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
 
@@ -30,6 +31,7 @@ namespace Qerp.Models
         public virtual Contact Contact { get; set; }
         public virtual Parameter ProjectType { get; set; }
         public virtual Prospect Prospect { get; set; }
+        public virtual Parameter Status { get; set; }
 
 
     }

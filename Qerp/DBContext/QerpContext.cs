@@ -1162,6 +1162,10 @@ namespace Qerp.DBContext
                     .HasColumnType("bigint(20)")
                     .HasColumnName("companyId");
 
+                entity.Property(e => e.StatusId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("statusId");
+
                 entity.Property(e => e.Created)
                     .HasColumnType("datetime")
                     .HasColumnName("created")
@@ -1218,6 +1222,11 @@ namespace Qerp.DBContext
                     .WithMany()
                     .HasForeignKey(d => d.ProspectId)
                     .HasConstraintName("FK_projects_prospects");
+
+                entity.HasOne(d => d.Status)
+                    .WithMany()
+                    .HasForeignKey(d => d.StatusId)
+                    .HasConstraintName("FK_projects_projectstatus");
             });
 
             modelBuilder.Entity<Projectcontact>(entity =>
@@ -1345,6 +1354,10 @@ namespace Qerp.DBContext
                     .HasColumnType("bigint(20)")
                     .HasColumnName("prospectTypeId");
 
+                entity.Property(e => e.StatusId)
+                    .HasColumnType("bigint(20)")
+                    .HasColumnName("statusId");
+
                 entity.Property(e => e.Updated)
                     .HasColumnType("datetime")
                     .ValueGeneratedOnAddOrUpdate()
@@ -1374,6 +1387,11 @@ namespace Qerp.DBContext
                     .HasForeignKey(d => d.ProspectTypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_prospects_prospecttypes");
+
+                entity.HasOne(d => d.Status)
+                    .WithMany()
+                    .HasForeignKey(d => d.StatusId)
+                    .HasConstraintName("FK_prospects_prospectstatus");
             });
 
             modelBuilder.Entity<Province>(entity =>

@@ -151,6 +151,7 @@ namespace Qerp.ModelViews
                     .Include(p => p.Client)
                     .Include(p => p.Contact)
                     .Include(p => p.ProspectType)
+                    .Include(p => p.Status)
                     .Where(c =>
                         c.CompanyId == companyId &&
                         (
@@ -166,7 +167,8 @@ namespace Qerp.ModelViews
                                 (this.ProspectTypeId == null || c.ProspectTypeId == this.ProspectTypeId) &&
                                 (this.Description == null || c.Description.Contains(this.Description)) &&
                                 (this.DeadlineFrom == null || c.Deadline >= this.DeadlineFrom) &&
-                                (this.DeadlineTo == null || c.Deadline <= this.DeadlineTo)
+                                (this.DeadlineTo == null || c.Deadline <= this.DeadlineTo) &&
+                                (this.StatusId == null || c.StatusId == this.StatusId)
                             )
                         )
                     )
