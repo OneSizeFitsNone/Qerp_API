@@ -76,7 +76,9 @@ namespace Qerp.ModelViews
         {
             try
             {
+
                 using QerpContext db = new QerpContext();
+                
                 List<Apptypecontact> lstApptypecontacts = await db.Apptypecontacts
                     .Include(c => c.Client)
                     .ThenInclude(cc => cc.City)
@@ -98,9 +100,12 @@ namespace Qerp.ModelViews
                             (apptypeId == AppTypeMV.Client && cc.ClientId == linkedId)
                         )
                      )
-                    .OrderBy(cc => cc.Client)
+                    .OrderBy(cc => cc.Project.Number)
+                    .ThenBy(cc => cc.Prospect.Number)
+                    .ThenBy(cc => cc.Client.Name)
                     .ThenBy(cc => cc.Contact.Fullname)
                     .ToListAsync();
+
                 return new ReturnResult(true, "", lstApptypecontacts);
             }
             catch (Exception ex)
