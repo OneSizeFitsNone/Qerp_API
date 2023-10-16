@@ -1536,6 +1536,14 @@ namespace Qerp.DBContext
                     .HasColumnType("datetime")
                     .HasColumnName("deadline");
 
+                entity.Property(e => e.Start)
+                    .HasColumnType("datetime")
+                    .HasColumnName("start");
+
+                entity.Property(e => e.End)
+                    .HasColumnType("datetime")
+                    .HasColumnName("end");
+
                 entity.Property(e => e.Description)
                     .HasColumnType("text")
                     .HasColumnName("description");
