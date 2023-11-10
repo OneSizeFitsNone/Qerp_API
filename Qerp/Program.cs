@@ -20,7 +20,7 @@ using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container. test clean install
 var connectionString = builder.Configuration.GetConnectionString("QerpContext");
 
 
